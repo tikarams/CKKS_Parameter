@@ -25,7 +25,7 @@
     MultiplicativeDepth=6;
     ScalingModSize=70
     RingDimension=32768
-    RingModulus=465
+    RingModulus=524
     
     batchSize = 8;
     MultiplicativeDepth=6;
