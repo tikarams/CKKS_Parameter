@@ -58,8 +58,10 @@
   (Dimension,modulus): (log(N),log(q)) as
 
                             (13,109) , (14,219) , (15,443)
+			    
+			    
                             
-Distribution	 	N 	security_level	logq	    uSVP	  dec	    	dual
+# Distribution	 	N 	security_level	logq	    uSVP	  dec	    	dual
 (-1,1)
 		        1024	    128         25         132.6	165.5		142.3
 			            
