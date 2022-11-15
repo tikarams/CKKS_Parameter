@@ -61,8 +61,10 @@
 			    
 			    
                             
-# Distribution	 	N 	security_level	logq	    uSVP	  dec	    	dual
-# (-1,1)
+# Secret Distribution: (-1,1)
+
+#                        N 	security_level	logq	    uSVP	  dec	    	dual
+
 		        1024	    128         25         132.6	165.5		142.3
 			            
 				    192	        17     	   199.9	284.1		222.2
