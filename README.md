@@ -2,7 +2,7 @@
 #This file is created to write the encryption paramters of CKKS encryption scheme.<br />
 #The following parameters are used in Ophenfhe library for 128 bit security.<br /> 
 #Error sampled from gaussion distribution with standard deviation 3.2 and <br /> 
-#Secret sampled from uniform ternary distribution.
+#Secret sampled from uniform ternary distribution with variance 1/3=.33333.
 
     batchSize = 8;
     MultiplicativeDepth=6;
@@ -63,7 +63,7 @@
 			    
 			    
  #Error Distribution: Gaussion with std. deviation 3.2;<br />
- #Secret Distribution: uniform ternary distribution viz. (-1,0,1) with variance ;<br />
+ #Secret Distribution: uniform ternary distribution viz. (-1,0,1) with variance 1/3=.33333;<br />
  #Delta=2**40 <br />
  
 ---------------------------------------------------------------------------------------------------------------------------------------
