@@ -1,5 +1,5 @@
 # CKKS_Parameter
-#This file is created to write the encryption paramters of CKKS encryption scheme.
+#This file is created to write the encryption paramters of CKKS encryption scheme.<br />
 #The following parameters are used in Ophenfhe library for 128 bit security.<br /> 
 #Error sampled from gaussion distribution with standard deviation 3.2 and <br /> 
 #Secret sampled from uniform ternary distribution. 
@@ -54,17 +54,20 @@
     RingDimension=16384
     RingModulus=284
     
- Apart form the above mentioned parameters homomorphic encryptio standars suggests following paramters as secure parameters.
- The same parametes have been used in the paper "On the precision loss in approximate homomorphic encryption" with error sampled from gaussion distribution with standard deviation 3.2 and secret sampled from uniform ternary distribution 
-# Delta=2**40
+ Apart form the above mentioned parameters homomorphic encryption standar suggests following paramters as secure parameters. <br />
+ The same parametes have been used in the paper "On the precision loss in approximate homomorphic encryption" as mentioned below.<br />
 
 (Dimension,modulus): (log(N),log(q)) as
 
-                            (13,109) , (14,219) , (15,443)
+                            (13,109) , (14,220) , (15,443)
 			    
 			    
+ #Error Distribution: Gaussion with std. deviation 3.2;<br />
+ #Secret Distribution: (-1,0,1);<br />
+ #Delta=2**40 <br />
 
- # Secret Distribution: (-1,1)    ;Delta=2**40                                   
+Here is the list of parameter values for varing security levels. Secret and error distribution remains same as that of mentioned above. <br />
+(Here number corresponding to SVP, dec and dual means bit security provided by the parameter values when attacked using unique svp ,decoding and dual attack)
 
 | N    |security_level|	logq  |	    uSVP   |	  dec	 |   	dual  |
 |------|--------------|-------|------------|-------------|------------|
@@ -74,7 +77,7 @@
 | 2048 |    128	      | 51    |	    128.6  |	144.3	 |	133.4 |	
 |      |    192	      | 35    |	    193.5  |	231.9	 |	205.2 |
 |      |    256	      | 27    |	    257.1  |	327.8	 |	274.4 |
-|4096  |    128	      | 101   |	    129.6  |	137.4	 |	131.5 | 
+| 4096 |    128	      | 101   |	    129.6  |	137.4	 |	131.5 | 
 |      |    192	      | 70    |	    193.7  |	213.6	 |	198.8 |
 |      |    256	      | 54    |	    259.7  |	295.2	 |	270.6 |
 | 8192 |    128	      | 202   |	    129.8  |	130.7	 |	128.0 |
