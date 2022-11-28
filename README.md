@@ -65,7 +65,8 @@
  #Error Distribution: Gaussion with std. deviation 3.2;<br />
  #Secret Distribution: uniform ternary distribution viz. (-1,0,1) with variance 1/3;<br />
  #Delta=2**40 <br />
-
+ 
+---------------------------------------------------------------------------------------------------------------------------------------
 Here is the list of parameter values for varing security levels. Secret and error distribution remains same as that of mentioned above. <br />
 (Here number corresponding to SVP, dec and dual means bit security provided by the parameter values when attacked using unique svp ,decoding and dual attack)
 
