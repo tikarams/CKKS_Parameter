@@ -1,8 +1,8 @@
 # CKKS_Parameter
 #This file is created to write the encryption paramters of CKKS encryption scheme.
 #The following parameters are used in Ophenfhe library for 128 bit security.
-# Error sampled from gaussion distribution with standard deviation 3.2 and 
-# Secret sampled from uniform ternary distribution. 
+#Error sampled from gaussion distribution with standard deviation 3.2 and 
+#Secret sampled from uniform ternary distribution. 
 
     batchSize = 8;
     MultiplicativeDepth=6;
