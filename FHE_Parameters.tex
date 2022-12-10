@@ -1,9 +1,11 @@
 \documentclass[a4paper,10pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage{multirow}
+\usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage{comment}
 %opening
-\title{CKKS parameter}
+\title{CKKS Error Estimation and Parameter}
 \author{}
 \date{}
 
@@ -11,11 +13,91 @@
 
 \maketitle
 
+\paragraph{CKKS Error Estimation}
+The number of error bits in fresh ciphertext $c_1$ encrypting message $m_1$ using error distribution $N(0,\sigma^2 I_N)$ and secret distribution $\{-1,0,1\}$ is given by (Using Central Limit Theory (CLT))
+
+\begin{equation}
+ \epsilon_1 = \frac{1}{2}\log N(\rho_{fresh}^2+\frac{1}{12}) + log H_c (\alpha,N)
+\end{equation}
+where
+
+\begin{align*}
+    \rho^2_{fresh}&=(\frac{4}{3}N+1)\sigma^2 \\
+    H_c (\alpha,N)&=(-\log (1-(1-\alpha)^\frac{2}{N})^\frac{1}{2}
+\end{align*}
+
+$\alpha$ =failure probability or error tolerance
+
+Similarly, ciphertext $c_2$ encrypting message $m_2$ using the error distribution $N(0,\sigma'^2 I_N)$ and same secret distribution can be written as
+\begin{equation}
+ \epsilon_2 = \frac{1}{2}\log N(\rho_{fresh}'^2+\frac{1}{12}) + log H_c (\alpha,N)
+\end{equation}
+where
+\begin{align*}
+    \rho'^2_{fresh}&=(\frac{4}{3}N+1)\sigma'^2 \\
+\end{align*}
+
+\paragraph{Addition} Adding these two ciphertext results into ciphertext with error bits
+\begin{align}
+  \epsilon_1+\epsilon_2 &= \frac{1}{2}\log N(\rho_{fresh}''^2+\frac{1}{6}) + log 2H_c (\alpha,N)
+\end{align}
+where
+\begin{align*}
+    \rho''^2_{fresh}&=(\frac{4}{3}N+1)(\sigma^2+\sigma'^2) \\
+\end{align*}
+
+\paragraph{Multiplication by constant}: Multiplying the ciphertext with a constant results in a ciphertext with error as
+\begin{align}
+    err &= ||\lambda||^2_2(\frac{4}{3}N+1)\sigma^2
+\end{align}
+
+\paragraph{Multiplication}: Multiplication of two ciphertext results into ciphertext with error of the following form
+\begin{align}
+    B_{final\ error} &= \Delta^{-1}(B_{mult}+B_{ks})+B_{round}
+\end{align}
+
+\begin{align*}
+B_{mult} &= N(0,N\rho_{fresh}^2\rho_{fresh}'^2I_N) \\
+  B_{ks} &= N(0,\eta_{ks}^2I_N) \\
+  B_{round} &= N(0,\eta_{round}^2 I_N)
+\end{align*}
+where
+
+\begin{align*}
+\rho_{fresh}^2 &=(\frac{4}{3}N+1)\sigma^2 \\
+\rho_{fresh}'^2 &=(\frac{4}{3}N+1)\sigma'^2 \\
+\eta_{ks}^2     &=\frac{1}{12}p^{-2}q^2_{l}N\sigma^2+1_{p \nmid q_l}(\frac{N}{18}+\frac{1}{12}) \\
+                &=\frac{1}{12} N\sigma^2 \hspace{3em}[usually\ \ p^{-2}q^2_{l}\approx 1]\\
+\eta^2_{round}  &= \frac{N}{18} + \frac{1}{12}\\
+\end{align*}
+
+The final error of multiplication of two ciphertext can be written down as
+\begin{align}
+    B_{final\ error} &= \Delta^{-1}(N(0,N\rho_{fresh}^2\rho_{fresh}'^2I_N)+ N(0,\eta_{ks}^2I_N))+N(0,\eta_{round}^2 I_N) \nonumber \\
+                     &= N(0,\Delta^{-2}N(\rho_{fresh}^2\rho_{fresh}'^2+\frac{1}{12}\sigma^2)I_N) + N(0,(\frac{N}{18}+\frac{1}{12})I_N) \nonumber \\
+                     &= N \biggl(0,\Bigl(\Delta^{-2}N(\rho_{fresh}^2\rho_{fresh}'^2+\frac{1}{12}\sigma^2)+\frac{N}{18}+\frac{1}{12}\Bigr)I_N\biggl) \nonumber \\
+                     &=N(0,\rho_{mult\ error}^2I_N)
+\end{align}
+where
+\begin{align*}
+\rho_{mult\ error}^2 &= \Delta^{-2}N(\rho_{fresh}^2\rho_{fresh}'^2+\frac{1}{12}\sigma^2)+\frac{N}{18}+\frac{1}{12}  \\
+\end{align*}
+
+
+
+
+
+
+
+
+\newpage
+\paragraph{CKKS parameter} Here is the list of parameter values suggested by the homomorphic encryption standar to retain differnt security levels.
+
 
 
 
 \begin{center}
-\begin{table}
+\begin{table}[h]
 \begin{tabular}{|c|c|c|c|c|c|}
 \hline
 N  &  security level & $\log q$ &  uSVP & dec & dual  \\
