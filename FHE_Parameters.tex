@@ -41,14 +41,14 @@ where
 \begin{align}
   \epsilon_1+\epsilon_2 &= \frac{1}{2}\log N(\rho_{fresh}''^2+\frac{1}{6}) + log 2H_c (\alpha,N)
 \end{align}
-where
+with new error $N(0,\rho''^2_{fresh}I_N)$, where
 \begin{align*}
     \rho''^2_{fresh}&=(\frac{4}{3}N+1)(\sigma^2+\sigma'^2) \\
 \end{align*}
 
-\paragraph{Multiplication by constant}: Multiplying the ciphertext with a constant results in a ciphertext with error as
+\paragraph{Multiplication by constant}: Multiplying the ciphertext with a constant $\lambda$ results in a ciphertext with new error $N(0,\rho_{mul const}^2I_N)$ where
 \begin{align}
-    err &= ||\lambda||^2_2(\frac{4}{3}N+1)\sigma^2
+    \rho_{mul const}^2 &= ||\lambda||^2_2(\frac{4}{3}N+1)\sigma^2
 \end{align}
 
 \paragraph{Multiplication}: Multiplication of two ciphertext results into ciphertext with error of the following form
@@ -128,7 +128,7 @@ N  &  security level & $\log q$ &  uSVP & dec & dual  \\
 \hline
 
 \end{tabular}
-\caption{The differnt parameter values shown in the table means following $N$ is the ring dimension, security level is the bit security provided by the chosen parameter valuse equivalent to that of AES, $\log q$ is the number of bits in the modulus $q$. $uSVP$ represents the bit security against attack using unique shortest vector problem, $dec$ represents the bit security against decoding attack and $dual$ represnts the bit security against dual attack.}
+\caption{The differnt parameters shown in the table represents the following: $N$ is the ring dimension, security level is the bit security provided by the parameters equivalent to that of AES bit security. $\log q$ is the number of bits in the modulus $q$. $uSVP$ represents the bit security against unique shortest vector attack, $dec$ represents the bit security against decoding attack and $dual$ represnts the bit security against dual attack.}
 \end{table}
 \end{center}
 
