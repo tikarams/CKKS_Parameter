@@ -5,39 +5,132 @@
 \usepackage{amssymb}
 \usepackage{comment}
 %opening
-\title{CKKS Error Estimation and Parameter}
+\usepackage{multirow}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{ae}
+\usepackage{xfrac}
+\usepackage{aecompl}
+\usepackage[english]{babel}
+\usepackage{amsmath,mathtools}
+%\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{bbm}
+\usepackage{amscd}
+%\usepackage{bbm}
+%\usepackage{url}
+\usepackage{hyperref}
+\usepackage{enumerate}
+%\usepackage[left=3cm,top=3cm,bottom=2cm,right=3cm,head=1cm,foot=1cm]{geometry}
+\usepackage{graphicx}
+%\usepackage[all,cmtip]{xy} 
+%\usepackage{float}
+\usepackage{subcaption}
+%\usepackage{algorithm}
+%\usepackage{algpseudocode}
+%\usepackage{xcolor}
+\usepackage{multirow}
+%\usepackage[justification=centering,font={small,it}]{caption}
+\usepackage{array}
+%\usepackage{colortbl}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{color}
+\usepackage[table]{xcolor}
+%% To remove comments, change the below line to
+%% \usepackage[colorinlistoftodos,prependcaption,disable]{todonotes}
+\usepackage[colorinlistoftodos,prependcaption]{todonotes}
+\usepackage{tikz-cd}
+\usepackage{tikz,pgfplots}
+\usetikzlibrary{calc}
+\usetikzlibrary{arrows}
+\usetikzlibrary{arrows.meta}
+\usepackage{rotating}
+\usetikzlibrary{backgrounds}
+\usepackage{placeins}
+\usepackage{xargs}
+\usepackage{cleveref}
+\title{CKKS Error Estimation and Parameters}
 \author{}
 \date{}
 
 \begin{document}
-
+\input{symbols}
 \maketitle
 
-\paragraph{CKKS Error Estimation}
-The number of error bits in fresh ciphertext $c_1$ encrypting message $m_1$ using error distribution $N(0,\sigma^2 I_N)$ and secret distribution $\{-1,0,1\}$ is given by (Using Central Limit Theory (CLT))
+\section{Preliminaries}
+Let $\chi$ is a discrete Gaussian, usually of standard
+deviation $\sigma = 3.2$. We denote by $\mathcal{ZO}(\rho)$ the distribution where $0$ is 
+sampled with probability $\rho$, and $\pm 1$ are sampled with probability $\rho/2$.
+We denote the secret key distribution by $S$. This is usually the unifrom ternary distribution. 
+
+We use the notation $R_Q$ to denote the ring $\ZZ[x]/(\Phi_N, Q)$, where 
+$\phi_N = x^N + 1$. $[\cdot]_Q$ denotes modular reduction $\mod Q$ (usually centered around 0).
+
+\section{The CKKS scheme}
+
+\begin{figure}[h]
+	\begin{description}	
+		\item[$\texttt{SecretKeyGen}(\lambda)$:] Sample $s \leftarrow S$ and 
+	output \( \texttt{sk}=(1,s)\). 
+		
+		\item[$\texttt{PublicKeyGen}(\texttt{sk})$:]   For $\texttt{sk}=(1,s)$, sample $a \leftarrow R_Q$ 
+		uniformly at random and $e \leftarrow \chi$. Output \(\texttt{pk}=\left([-as + e]_Q , a\right)\). 
+		
+		\item[$\texttt{Encrypt}(\texttt{pk},m)$:] For the message $m \in R$. Let $\texttt{pk} = 
+		(p_0,p_1)$, sample $v \leftarrow S$ and $e_1,e_2 \leftarrow \chi$. Output
+		\( \texttt{ct} = \left([m + p_0 v + e_1]_Q , [p_1 v + e_2]_Q \right)\). 
+		
+		\item[$\texttt{Decrypt}(\texttt{sk},\texttt{ct})$:]   Let $\texttt{ct} = (c_0,c_1)$. Output
+		$m^\prime = [c_0+ c_1 s]_Q$. 
+	\end{description}
+\end{figure}
+
+Let $\ct$ be a fresh ciphertext encrypted under the public key $\pk$, where we have
+$\pk = \left([-as + e]_Q , a\right)$. Then, decrypting $\ct$ yields
+
+\begin{align*}
+	\dec(\ct, \sk) & = c_0 + sc_1 \pmod{Q} \\
+						   & = m + p_0c + e_1 + svp_1 + se_2 \\
+						   & = m + ve + e_1 + se_2.
+\end{align*}
+Recall $e, e_0, e_1 \leftarrow \chi$. 
+The ephemeral key $v$ here is drawn from the same distribution as 
+the secret key $\sk = (1, s)$, but sometimes it can be sampled from a slightly different 
+distribution. This can for example be the distribution $\mathcal{ZO}(\rho)$.
+
+
+\section{CKKS Error Estimation}
+The number of error bits in fresh ciphertext $c_1$ encrypting message $m_1$ using error 
+distribution $N(0,\sigma^2 I_N)$ and secret distribution $\{-1,0,1\}$ is given by (Using Central Limit 
+Theory (CLT) and results from~\cite{CCHMOP22}).
 
 \begin{equation}
- \epsilon_1 = \frac{1}{2}\log N(\rho_{fresh}^2+\frac{1}{12}) + log H_c (\alpha,N)
+ \epsilon_1 = \frac{1}{2}\log N(\rho_{fresh}^2+\frac{1}{12}) + log H_c (\alpha,N),
 \end{equation}
 where
 
 \begin{align*}
     \rho^2_{fresh}&=(\frac{4}{3}N+1)\sigma^2 \\
-    H_c (\alpha,N)&=(-\log (1-(1-\alpha)^\frac{2}{N})^\frac{1}{2}
+    H_c (\alpha,N)&=(-\log (1-(1-\alpha)^\frac{2}{N})^\frac{1}{2}.
 \end{align*}
+$\alpha$  represents the failure probability or error tolerance.
 
-$\alpha$ =failure probability or error tolerance
+Similarly, ciphertext $c_2$ encrypting message $m_2$ using error distribution $N(0,\sigma'^2 I_N)$ 
+and same secret distribution can be written as
 
-Similarly, ciphertext $c_2$ encrypting message $m_2$ using error distribution $N(0,\sigma'^2 I_N)$ and same secret distribution can be written as
 \begin{equation}
- \epsilon_2 = \frac{1}{2}\log N(\rho_{fresh}'^2+\frac{1}{12}) + log H_c (\alpha,N)
+ \epsilon_2 = \frac{1}{2}\log N(\rho_{fresh}'^2+\frac{1}{12}) + log H_c (\alpha,N),
 \end{equation}
 where
+
 \begin{align*}
-    \rho'^2_{fresh}&=(\frac{4}{3}N+1)\sigma'^2 \\
+    \rho'^2_{fresh}&=(\frac{4}{3}N+1)\sigma'^2. \\
 \end{align*}
 
-\paragraph{Addition} Adding these two ciphertext results into ciphertext with error bits
+\subsection{Addition} 
+Adding these two ciphertext results into ciphertext with error bits
 \begin{align}
   \epsilon_1+\epsilon_2 &= \frac{1}{2}\log N(\rho_{fresh}''^2+\frac{1}{6}) + log 2H_c (\alpha,N)
 \end{align}
@@ -46,12 +139,14 @@ with new error $N(0,\rho''^2_{fresh}I_N)$, where
     \rho''^2_{fresh}&=(\frac{4}{3}N+1)(\sigma^2+\sigma'^2) \\
 \end{align*}
 
-\paragraph{Multiplication by constant}: Multiplying the ciphertext with a constant $\lambda$ results in a ciphertext with new error $N(0,\rho_{mul const}^2I_N)$ where
+\subsection{Multiplication by constant}: Multiplying the ciphertext with a constant $\lambda$ 
+results in a ciphertext with new error $N(0,\rho_{mul const}^2I_N)$ where
 \begin{align}
     \rho_{mul const}^2 &= ||\lambda||^2_2(\frac{4}{3}N+1)\sigma^2
 \end{align}
 
-\paragraph{Multiplication}: Multiplication of two ciphertext results into ciphertext with error of the following form
+\subsection{Multiplication}: Multiplication of two ciphertext results into ciphertext with error of the 
+following form
 \begin{align}
     B_{final\ error} &= \Delta^{-1}(B_{mult}+B_{ks})+B_{round}
 \end{align}
@@ -88,10 +183,10 @@ where
 
 
 
+\section{CKKS parameter} 
 
-
-\newpage
-\paragraph{CKKS parameter} Here is the list of parameter values suggested by the homomorphic encryption standar to retain differnt security levels.
+Here is the list of parameter values suggested by the homomorphic encryption standar to retain 
+different security levels.
 
 
 
@@ -214,6 +309,10 @@ This file contains the parameter values used for homomorphic encryption scheme C
 
 \end{comment}
 
+\newpage
+
+\bibliography{local}
+\bibliographystyle{plain}
 
 
 
