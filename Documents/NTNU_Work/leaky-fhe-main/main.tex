@@ -308,12 +308,12 @@ N  &  security level & $\log_2 {Q}$ &  uSVP & dec & dual  \\
 \hline
 
 \end{tabular}
-\caption{The differnt parameters shown in the table represents the following: $N$ is the ring dimension, security level is the bit security provided by the parameters equivalent to that of AES bit security. $\log q$ is the number of bits in the modulus $q$. $uSVP$ represents the bit security against unique shortest vector attack, $dec$ represents the bit security against decoding attack and $dual$ represnts the bit security against dual attack.}
+\caption{The differnt parameters shown in the table represents the following: $N$ is the ring dimension, security level is the bit security provided by the parameters equivalent to that of AES bit security. $\log Q$ is the number of bits in the modulus $Q$. $uSVP$ represents the bit security against unique shortest vector attack, $dec$ represents the bit security against decoding attack and $dual$ represnts the bit security against dual attack.}
 \label{Tab:bit_security}
 \end{table}
 \end{center}
 
-In CKKS encryption scheme to get the bit security as that of values mentioned in Table \ref{Tab:bit_security}, the modulus value have to follow the mentioned threshold number of bits. Which means modulus value that is used for the evaluation key have to follow the number of bits shown in the table \ref{Tab:bit_security}\cite{kim2022approximate}. For example to obtain $128$-bit security when $N$ is set to $10$ the value of $\log_2{(Pq)} \leq \log_2{Q} =27$-bits. $q$ is usually set as $q_L=q_0\cdot \Delta^L$ (usually $q_0$ is larger than $\Delta$ for correct decryption \cite{kim2022approximate} and lies in range $\Delta<q_0<\Delta^2$, \cite{cheon2021practical}), $L$ represents the multiplicative depth of the circuit. $P$ is usually selected same bit size as that of $q_L$, so that the key switching-error is bounded by $P^{-1}\cdot q_L \cdot B_{ks}+B_{rs} \approx B_{rs}$ \cite{cheon2017homomorphic}.
+In CKKS encryption scheme to get the bit security as that of values mentioned in Table \ref{Tab:bit_security}, the modulus value have to follow the mentioned threshold number of bits. Which means modulus value that is used for the evaluation key have to follow the number of bits shown in the table \ref{Tab:bit_security}\cite{kim2022approximate}. For example to obtain $128$-bit security when $N$ is set to $10$ the value of $\log_2{(Pq)} \leq \log_2{Q} =27$-bits. $q$ is usually set as $q=q_0\cdot \Delta^L$ (usually $q_0$ is larger than $\Delta$ for correct decryption \cite{kim2022approximate} and lies in range $\Delta<q_0<\Delta^2$, \cite{cheon2021practical}), $L$ represents the multiplicative depth of the circuit. $P$ is usually selected same bit size as that of $q$, so that the key switching-error is bounded by $P^{-1}\cdot q \cdot B_{ks}+B_{rs} \approx B_{rs}$ \cite{cheon2017homomorphic}.
 
 For example in HEAAN library to obtain $128$-bit security following paramters values have been mentioned.
 \begin{align*}
@@ -323,7 +323,7 @@ For example in HEAAN library to obtain $128$-bit security following paramters va
 \sigma        &= 3.2          \\
 \end{align*}
 
-
+This is because when we set modulus $Q=1600$, we have to set $N=16$ then only we will get $128$-bit security.
 
 
 
