@@ -1,0 +1,182 @@
+\documentclass[12pt]{article}
+\usepackage[paper=letterpaper,margin=2cm]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{newtxtext, newtxmath}
+\usepackage{enumitem}
+\usepackage{titling}
+\usepackage[colorlinks=true]{hyperref}
+
+\setlength{\droptitle}{-6em}
+
+% Enter the specific assignment number and topic of that assignment below, and replace "Your Name" with your actual name.
+\title{A Note on the Expected Determinant}
+\author{Rui Tang}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+$2n\times2n$ diagonal matrix
+$$
+\Sigma=
+\begin{bmatrix}
+\sigma_{s}^2&&&&&\\ 
+&\ddots &&&&&\\
+&&\sigma^2_{s}&&& \\
+&&&\sigma_{e}^2&& \\
+&&&&\ddots& \\
+&&&&&\sigma_{e}^2
+\end{bmatrix}
+=
+\begin{bmatrix}
+\Sigma_{s}&0 \\
+0&\Sigma_{e}
+\end{bmatrix}.
+$$
+If only consider secret hints:
+$$
+\mathbf{s}\cdot \mathbf{h}=\mathbf{s}\mathbf{V}\mathbf{B}\mathbf{P}\mathbf{M}(h_{s})(\mathbf{V}\mathbf{B}\mathbf{P})^{-1},
+$$
+where $\mathbf{R}:=\mathbf{V}\mathbf{B}\mathbf{P}$, $\mathbf{V}$ is the canonical embedding transformation, $\mathbf{B}$ is the matrix corresponding to the isomorphism between $H \subset \mathbb{C}_m^*$ and $\mathbb{R}^n$, where $n=\phi(m), \mathbf{P}$ is a permutation matrix, and $\mathbf{M}(h)$ is a block diagonal matrix with $n / 2$ blocks, each of dimension $2 \times 2$, where the $i$-th block is
+$$
+\begin{bmatrix}
+1 / \sqrt{2} v_i & 1 / \sqrt{2} v_{n-i} \\
+-1 / \sqrt{2} v_{n-i} & 1 / \sqrt{2} v_i
+\end{bmatrix},
+$$
+and $\mathbf{v}=\left(v_1, \ldots, v_n\right)$ is equal to $\mathbf{v}=\mathbf{h V B P}$.
+
+Then, after concatenating secrete and error:
+$$
+(s\mid \mid e)\cdot (h_{s}\mid\mid h_{e})=(s\mid \mid e)
+\begin{bmatrix}
+R&0 \\
+0&R
+\end{bmatrix}
+\begin{bmatrix}
+A_{1} \\
+A_{2}
+\end{bmatrix}
+R^{-1}
+$$
+Since $R$ is a real orthogonal matrix, $R^{-1}=R^{T}$. Let 
+$$
+\mathbf{H}=
+\begin{bmatrix}
+R&0 \\
+0&R
+\end{bmatrix}
+\begin{bmatrix}
+A_{1} \\
+A_{2}
+\end{bmatrix}
+R^{-1}.
+$$
+Then the modified determinant with error is
+
+
+
+
+
+
+\begin{align*}
+    \quad&\det \left( \mathbf{H}^{T}\Sigma^{\frac{1}{2}}\left( \mathbf{H}^{T}\Sigma^{\frac{1}{2}} \right)^{T} + {\color{red}\Sigma_\epsilon}\right)\\
+    =&\,\,\det \left( \mathbf{H}^{T}\Sigma \mathbf{H} {\color{red}+\Sigma_\epsilon}\right) \\
+    =&\,\,\det\left(
+    R
+    \begin{bmatrix}
+    A_{1}^{T}&
+    A_{2}^{T}
+    \end{bmatrix}
+    \begin{bmatrix}
+    R^{T}&0 \\
+    0&R^{T}
+    \end{bmatrix}
+    \Sigma
+    \begin{bmatrix}
+    R&0 \\
+    0&R
+    \end{bmatrix}
+    \begin{bmatrix}
+    A_{1} \\
+    A_{2}
+    \end{bmatrix}
+    R^{T}{\color{red}+\Sigma_\epsilon}
+    \right)\\
+    =\,\,&\det \left( 
+    \begin{bmatrix}
+    RA_{1}^{T}R^{T}&
+    RA_{2}^{T}R^{T}
+    \end{bmatrix}
+    \Sigma
+    \begin{bmatrix}
+    RA_{1}R^{T}\\ 
+    RA_{2}R^{T}
+    \end{bmatrix}{\color{red}+\Sigma_\epsilon}
+    \right) \\
+    =\,\,&\det \left( 
+    \begin{bmatrix}
+    RA_{1}^{T}R^{T}&
+    RA_{2}^{T}R^{T}
+    \end{bmatrix}
+    \begin{bmatrix}
+    \Sigma_{s}&0 \\
+    0&\Sigma_{e}
+    \end{bmatrix}
+    \begin{bmatrix}
+    RA_{1}R^{T}\\ 
+    RA_{2}R^{T}
+    \end{bmatrix}{\color{red}+\Sigma_\epsilon}
+    \right)\\
+    =\,\,&\det \left( 
+    R(\sigma_{s}A_{1}^{T})R^{T}R(\sigma_{s}A_{1})R^{T}+R(\sigma_{e}A_{2}^{T})R^{T}R(\sigma_{e}A_{2})R^{T}{\color{red}+R\Sigma_\epsilon R^T}
+    \right) \\
+    =\,\,&\det\left( 
+    \sigma_{s}^2A_{1}^{T}A_{1}+\sigma_{e}^2A_{2}^{T}A_{2}{\color{red}+\sigma_\epsilon^2 I}
+    \right),
+\end{align*}
+
+where $R^{T}R=nI_n$.
+
+\begin{align*}
+    \quad&\det\left( \sigma_{s}^2A_{1}^{T}A_{1}+\sigma_{e}^2A_{2}^{T}A_{2} {\color{red}+\sigma_\epsilon^2 I}\right) \\
+    =\,\,& \frac{1}{2^n} \prod_{i\in\left[ \frac{n}{2} \right]}\left( \sigma_{s}^2v_{i,h_{s}}^2+\sigma_{s}^2v_{n-i,h_{s}}^2+\sigma_{e}^2v_{i,h_{e}}^2+\sigma_{e}^2v_{n-i,h_{e}}^2 {\color{red} + 2\sigma_\epsilon^2} \right)^2 ,
+\end{align*}
+
+where $v_{i,h_{s}}\sim \mathcal{N}\left( 0,n\sigma_{h_{s}}^2 \right)$, $v_{i,h_{e}}\sim \mathcal{N}\left( 0,n\sigma_{h_{e}}^2 \right)$.\\ 
+
+% Question: How does the symetric independece of $v_{i}$ and $v_{n-i}$ come from? How about the independence across different i's (Rui: Probably should be independent since entries of h are distrbuted independently)?
+
+% Also, I have some difficulty reasoning about the following:\\
+
+Since $\mathbf{V B P}$ is an isometric matrix (an orthogonal matrix scaled by $\sqrt{n}$ ), we have that $\sigma_h^2(\mathbf{V B P})(\mathbf{V B P})^T=n \sigma_h^2 \cdot \mathbf{I}_n$. So for each $i \in[n / 2], v_i$ and $v_{n-i}$ are distributed as independent Gaussians with variance $n \sigma_h^2$. \\
+
+
+Want to show for all $i\neq j$,
+$$
+\left( v_{i,h_{s}},v_{n-i,h_{s}},v_{i,h_{e}},v_{n-i,h_{e}}\right)\text{ is independent of }\left( v_{j,h_{s}},v_{n-j,h_{s}},v_{j,h_{e}},v_{n-j,h_{e}}\right).
+$$
+
+Then the expectation of $\det\left( \sigma_{s}^2A_{1}^{T}A_{1}+\sigma_{e}^2A_{2}^{T}A_{2} \right)$ is
+
+
+\begin{align*}
+    \quad&\mathbb{E}\det\left( \sigma_{s}^2A_{1}^{T}A_{1}+\sigma_{e}^2A_{2}^{T}A_{2}+\sigma_\epsilon^2 I \right)\\
+    =\quad& \frac{1}{2^n} \prod_{i\in\left[ \frac{n}{2} \right]}\mathbb{E} \left( \sigma_{s}^2v_{i,h_{s}}^2+\sigma_{s}^2v_{n-i,h_{s}}^2+\sigma_{e}^2v_{i,h_{e}}^2+\sigma_{e}^2v_{n-i,h_{e}}^2{\color{red} + 2\sigma_\epsilon^2} \right)^2\\
+    =\quad& \frac{1}{2^n} \prod_{i\in\left[ \frac{n}{2} \right]} \Bigg(\mathbb{E} \left( \sigma_{s}^4v^4_{i,h_{s}}+\sigma_{s}^4v_{i,h_{s}}^2v_{n-i,h_{s}}^2+\sigma_{s}^2\sigma_{e}^2v_{i,h_{s}}^2v_{i,h_{e}}^2+\sigma_{s}^2\sigma_{e}^2v_{i,h_{s}}^2v_{n-i,h_{e}}^2  {\color{red}+2\sigma^2_s\sigma_\epsilon^2v_{i,h_{s}}^2}
+    \right) \\
+    +\quad& \mathbb{E}\left( \sigma_{s}^4v_{i,h_{s}}^2v_{n-i,h_{s}}^2+\sigma_{s}^4v_{n-i,h_{s}}^4+\sigma_{s}^2\sigma_{e}^2v_{n-i,h_{s}}^2v_{i,h_{e}}^2+\sigma_{s}^2\sigma_{e}^2v_{n-i,h_{s}}^2v_{n-i,h_{e}}^2{\color{red}+2\sigma^2_s\sigma_\epsilon^2v_{n-i,h_{s}}^2} \right) \\
+    +\quad& \mathbb{E}\left( \sigma_{e}^2\sigma_{s}^2v_{i,h_{s}}^2v_{i,h_{e}}^2+\sigma_{e}^2\sigma_{s}^2v_{n-i,h_{s}}^2v_{i,h_{e}}^2+\sigma_{e}^4v_{i,h_{e}}^4+\sigma_{e}^4v_{i,h_{e}}^2v_{n-i,h_{e}}^2{\color{red}+2\sigma^2_e\sigma_\epsilon^2v_{i,h_{e}}^2} \right)\\
+    +\quad&\mathbb{E}\left( \sigma_{e}^2\sigma_{s}^2v_{i,h_{s}}^2v_{n-i,h_{e}}^2+\sigma_{e}^2\sigma_{s}^2v_{n-i,h_{s}}^2v_{n-i,h_{e}}^2+\sigma_{e}^4v_{i,h_{e}}^2v_{n-i,h_{e}}^2+\sigma_{e}^4v_{n-i,h_{e}}^4{\color{red}+2\sigma^2_e\sigma_\epsilon^2v_{n-i,h_{e}}^2} \right)\\
+    +\quad&{\color{red}2\sigma_\epsilon^2\mathbb{E}\left(  \sigma_{s}^2v_{i,h_{s}}^2+\sigma_{s}^2v_{n-i,h_{s}}^2+\sigma_{e}^2v_{i,h_{e}}^2+\sigma_{e}^2v_{n-i,h_{e}}^2{\color{red} + 2\sigma_\epsilon^2} 
+    \right)}\Bigg) \\
+    =\quad& \left( 2n^2(\sigma^4_s\sigma^4_{h_s}+\sigma^2_s\sigma^2_e\sigma^2_{h_s}\sigma^2_{h_e}+\sigma^4_e\sigma^4_{h_e})+ {\color{red}2n\sigma^2_\epsilon(\sigma^2_s\sigma^2_{h_s}+\sigma^2_e\sigma^2_{h_e})+\sigma^4_\epsilon} \right)^{\frac{n}{2}}
+    ,
+\end{align*}
+
+where $\mathbb{E}v_{i,h_{s}}^4=3n^2\sigma_{s}^4$, $\mathbb{E}v_{i,h_{e}}^4=3n^2\sigma_{e}^4$.
+
+\end{document}
+

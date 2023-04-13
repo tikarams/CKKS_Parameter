@@ -1,0 +1,35 @@
+\begin{thebibliography}{1}
+
+\bibitem{cheon2017homomorphic}
+Cheon, J.H., Kim, A., Kim, M., Song, Y.:
+\newblock Homomorphic encryption for arithmetic of approximate numbers.
+\newblock In: Advances in Cryptology--ASIACRYPT 2017: 23rd International
+  Conference on the Theory and Applications of Cryptology and Information
+  Security, Hong Kong, China, December 3-7, 2017, Proceedings, Part I 23,
+  Springer (2017)  409--437
+
+\bibitem{costache2022precision}
+Costache, A., Curtis, B.R., Hales, E., Murphy, S., Ogilvie, T., Player, R.:
+\newblock On the precision loss in approximate homomorphic encryption.
+\newblock Cryptology ePrint Archive (2022)
+
+\bibitem{kim2022approximate}
+Kim, A., Papadimitriou, A., Polyakov, Y.:
+\newblock Approximate homomorphic encryption with reduced approximation error.
+\newblock In: Topics in Cryptology--CT-RSA 2022: Cryptographers’ Track at the
+  RSA Conference 2022, Virtual Event, March 1--2, 2022, Proceedings, Springer
+  (2022)  120--144
+
+\bibitem{cheon2021practical}
+Cheon, J.H., Son, Y., Yhee, D.:
+\newblock Practical fhe parameters against lattice attacks.
+\newblock Cryptology ePrint Archive (2021)
+
+\bibitem{han2020better}
+Han, K., Ki, D.:
+\newblock Better bootstrapping for approximate homomorphic encryption.
+\newblock In: Topics in Cryptology--CT-RSA 2020: The Cryptographers’ Track at
+  the RSA Conference 2020, San Francisco, CA, USA, February 24--28, 2020,
+  Proceedings, Springer (2020)  364--390
+
+\end{thebibliography}

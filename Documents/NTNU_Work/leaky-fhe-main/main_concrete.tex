@@ -1,0 +1,254 @@
+\documentclass{llncs}[11pt]
+\usepackage{fullpage}
+
+%\pagestyle{plain}
+%\usepackage{amsmath,amsfonts,amssymb,amsthm}
+
+\let\proof\relax
+\let\endproof\relax
+\let\definition\relax
+\let\enddefinition\relax
+\let\lemma\relax
+\let\endlemma\relax
+\let\corollary\relax
+\let\endcorollary\relax
+
+\usepackage{amsthm} %NEW
+
+\usepackage{xspace,amsmath,amsfonts,amssymb,afterpage,mathtools}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage[colorlinks]{hyperref}
+\usepackage{fixltx2e}
+\usepackage{multirow}
+\usepackage{hhline}
+\usepackage{booktabs}
+
+\usepackage{mathtools}
+\usepackage{enumitem}
+\usepackage{csquotes}
+\usepackage{sidecap}
+\usepackage{wrapfig}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\usepackage[ruled]{algorithm2e}
+
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem*{notation}{Notation}
+\numberwithin{theorem}{section} % {subsection}
+
+
+
+
+\newcommand{\C}{{\mathbb{C}}}
+\newcommand{\F}{{\mathbb{F}}}
+\newcommand{\R}{{\mathbb{R}}}
+\newcommand{\Z}{{\mathbb{Z}}}
+
+\renewcommand\vec{\mathbf}
+
+\newcommand{\ket}[1]{|{#1}\rangle}
+\newcommand{\bra}[1]{\langle{#1}|}
+\newcommand{\braket}[2]{\<{#1}|{#2}\>}
+\newcommand{\norm}[1]{\|{#1}\|}
+\newcommand{\Norm}[1]{\left\|{#1}\right\|}
+
+\newcommand{\pth}[1]{\left({#1}\right)}
+
+\newcommand*\diff{\mathop{}\!\mathrm{d}}
+
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+
+\newcommand{\eq}[1]{(\ref{eq:#1})}
+\renewcommand{\sec}[1]{Section~\ref{sec:#1}}
+
+%ENCRYPTION SCHEME
+\newcommand{\Gen}{\mathsf{Gen}}
+\newcommand{\Enc}{\mathsf{Enc}}
+\newcommand{\Dec}{\mathsf{Dec}}
+\newcommand{\bin}{\mathsf{Dec}}
+\newcommand{\SIVP}{\mathsf{SIVP}}
+\newcommand{\GapSVP}{\mathsf{GapSVP}}
+\newcommand{\LWE}{\mathsf{LWE}}
+\newcommand{\Rql}{R_q^{\{1,\ldots, l\}}}
+
+
+%\newcommand{\eps}{\varepsilon}
+
+
+%DISTRIBUTION & EXPONENTIAL
+
+%SCENARIO3
+\newcommand{\EXP}[2]{e^{-\frac{\pi {#1}^2}{{#2}^2}}} % Used in scenario 3 only e^(-pi x^2/s^2)
+%\newcommand{\EXP}[2]{\exp{\left(\frac{-{#1}^2}{2{#2}}\right)}}
+
+%\newcommand{\EXPu}[3]{e^{-\frac{\pi ({#1}-{#2})^2}{{#3}^2}}} % Used in scenario 1 only e^(-pi (x-u)^2/s^2)
+
+\newcommand{\asub}{\frac{\pi}{\ssigma^2}+\frac{\pi}{v^2}}
+\newcommand{\censub}{\frac{z\ssigma^2}{v^2+\ssigma^2}}
+\newcommand{\gEXP}[2]{e^{-{#1\left(r{#2}\right)^2}}}  %generic exp(-a(r-c)^2)
+%\newcommand{\tEXP}[2]{e^{-\\pi{\left(r{#2}\right)^2}}}  %generic exp(-a(r-c)^2)
+\newcommand{\ssigma}{s}
+\newcommand{\temp}{\sigma}
+
+%OTHERS
+
+\newcommand{\bsub}{\frac{\mu_r}{\sigma_r^2}-\frac{\mu_e}{\sigma_e^2}+\frac{z}{\sigma_e^2}}
+\newcommand{\csub}{-\frac{\mu_r^2}{2\sigma_r^2}-\frac{\mu_e^2}{2\sigma_e^2}+\frac{\mu_ez}{\sigma_e^2}-\frac{z^2}{2\sigma_e^2}}
+
+%\newcommand{\iasub}{-\frac{1}{2v_i^2}-\frac{1}{2\sigma_i^2}}
+\newcommand{\iasub}{\frac{1}{s_i^2}+\frac{1}{v_i^2}}
+\newcommand{\ibsub}{\frac{u_i}{s_i^2}-\frac{\mu_i}{v_i^2}+\frac{z_i}{v_i^2}}
+\newcommand{\icsub}{-\frac{u_i^2}{2v_i^2}-\frac{\mu_i^2}{2\sigma_i^2}+\frac{\mu_iz_i}{\sigma_i^2}-\frac{z_i^2}{2\sigma_i^2}}
+
+\newcommand{\niasub}{\frac{1}{s^2}+\frac{1}{v^2}}
+\newcommand{\nibsub}{\frac{z_i}{v^2}}
+%\newcommand{\nicsub}{-\frac{\mu^2}{2\sigma^2}-\frac{z_i^2}{2\sigma^2}}
+
+\newcommand{\rtio}{\frac{1+\tau^2}{\tau^2}}%\newcommand{\rtio}{\frac{1+\alpha^2}{\alpha^2}}
+\newcommand{\rtniasub}{\frac{1+\alpha^2}{\alpha^2}\cdot\frac{1}{s^2}}
+\newcommand{\rtnibsub}{\frac{z_i}{v^2}}
+%\newcommand{\nicsub}{-\frac{\mu^2}{2\sigma^2}-\frac{z_i^2}{2\sigma^2}}
+
+%NOTATION CHANGING
+\newcommand{\xxip}{\xi'}
+\newcommand{\xxi}{\xi}
+
+\newcommand{\eps}{\varepsilon}
+\newcommand{\numsamp}{\mathsf{num}}
+\newcommand{\BKW}{\mathsf{BKW}}
+\newcommand{\BKWR}{\mathsf{BKW}_{\mathsf{R}}}
+\newcommand{\poly}{\mathsf{Poly}}
+\newcommand{\ber}{\mathsf{Ber}}
+
+\newcommand{\EX}{\mathbb{E}} %Expected value
+\newcommand{\Var}{\mathrm{Var}} %Vari
+\newcommand{\Cov}{\mathrm{Cov}} %Covariance
+
+\newcommand{\sm}[1]{\mathsf{s}_{#1}}
+\newcommand{\smx}[1]{\mathsf{s}_{#1}.x}
+\newcommand{\smb}[1]{\mathsf{s}_{#1}.b}
+
+\newcommand{\smp}[1]{\mathsf{s^{\text{p}}_{#1}}}
+\newcommand{\smpx}[1]{\mathsf{s^{\text{p}}_{#1}.x}}
+\newcommand{\smpb}[1]{\mathsf{s^{\text{p}}_{#1}.b}}
+
+% LPN Oracle -> lpno
+\newcommand{\lpno}[2]{\mathcal{O^{\mathsf{LPN}}_{\mathit{#1},#2}}(s)}
+% p-biased LPN Oracle -> plpno
+%\newcommand{\plpno}{\mathcal{O^{\mathsf{LPN}}_{\text{p},\eta}}}
+
+
+%Notations
+\newcommand{\kai}[2]{\mathlarger{\mathlarger{\chi}}_{#1, \mu}(#2)}
+\newcommand{\kaip}[2]{\mathlarger{\mathlarger{\chi}}_{#1, p}(#2)}
+\newcommand{\kaii}[1]{\mathlarger{\mathlarger{\chi}}_{#1}}
+\newcommand{\cord}[2]{#1[#2]}
+\newcommand{\innerprod}[3]{\langle #1, #2 \rangle_{#3}}
+\newcommand{\sample}[1]{\left( x_{#1}, b_{#1} \right)}
+\newcommand{\samplep}[1]{\left( x'_{#1}, b'_{#1} \right)}
+\newcommand{\allprod}[2]{#1 \odot #2 }
+
+
+
+\iftrue
+\newcommand{\dnote}[1]{{\color{red}{\bf [{\bf Dana:} #1]}}}
+\newcommand{\anote}[1]{{\color{blue}{\bf [Aria: #1]}}}
+\newcommand{\hnote}[1]{{\color{ForestGreen}{\bf [Hunter: #1]}}}
+\newcommand{\gnote}[1]{{\color{brown}{\bf [Huijing: #1]}}}
+\newcommand{\tnote}[1]{{\color{purple}{\bf [Tom: #1]}}}
+\fi
+
+
+\iffalse
+\newcommand{\dnote}[1]{}
+\newcommand{\anote}[1]{}
+\newcommand{\hnote}[1]{}
+\newcommand{\gnote}[1]{}
+\fi
+
+
+\newcounter{myclaimctr}
+\newenvironment{myclaim}{%      define a custom environment
+
+\refstepcounter{myclaimctr}% increment the environment's counter
+\medskip\noindent{\textbf{Claim \themyclaimctr .}}% or \textbf, \textit, .
+}{}  %          create a vertical offset to following material
+\numberwithin{myclaimctr}{section}
+
+
+%% Save Space
+
+%% Save the class definition of \subparagraph
+\let\llncssubparagraph\subparagraph
+%% Provide a definition to \subparagraph to keep titlesec happy
+\let\subparagraph\paragraph
+%% Load titlesec
+\usepackage[compact]{titlesec}
+%% Revert \subparagraph to the llncs definition
+\let\subparagraph\llncssubparagraph
+
+%default: \titlespacing*{\section} {0pt}{3.5ex plus 1ex minus .2ex}{2.3ex plus .2ex}
+\titlespacing*{\section} {0pt}{2.2ex plus 0.7ex minus .4ex}{1.7ex plus .17ex}
+%default: \titlespacing*{\subsection} {0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+\titlespacing*{\subsection} {0pt}{1.9ex plus 0.5ex minus .35ex}{1.0ex plus .13ex}
+%default: \titlespacing*{\subsubsection}{0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+\titlespacing*{\subsubsection}{0pt}{1.5ex plus 0.34ex minus .2ex}{0.9ex plus .16ex}
+
+%\titlespacing*{\paragraph}{0pt}{1.5ex plus 0.34ex minus .2ex}{0.9ex plus .16ex}
+
+
+%\makeatletter
+%\renewcommand{\parhead}[1]{\vskip0.34ex \noindent {\bfseries\boldmath\ignorespaces\dt@MaybeAddPunct{#1}}\hskip 0.9em plus 0.3em minus 0.3em}
+
+%%%%%%%%%%%%%
+
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{Concrete Security Loss in $IND$-$CPA^D$ Attacks on Approximate FHE}
+
+\author{
+}
+
+\institute{
+}
+
+
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{abstract}
+**
+\end{abstract}
+
+%	\begin{thebibliography}{9}
+%		\bibitem{Sho97}
+%		P. W. Shor, \emph{Polynomial-time algorithms for prime factorization and discrete logarithms on a quantum computer}, SIAM Journal on Computing 26, 1484--1509 (1997).
+%		\bibitem{GKPV10}
+%		Goldwasser, Shafi and Kalai, Yael Tauman and Peikert, Chris and Vaikuntanathan, Vinod, \emph{Robustness of the learning with errors assumption}, Tsinghua University Press, 2010.
+%	\end{thebibliography}
+
+%\bibliographystyle{splncs_alpha}
+%\bibliography{crypto/abbrev0,crypto/crypto,ref}
+
+\section{Adversarial Model}
+
+
+\section{Modeling Noisy Decryptions as Hints}
+
+
+\section{Expected Security Loss}
+
+
+\section{Experimental Validation}
+
+\end{document}

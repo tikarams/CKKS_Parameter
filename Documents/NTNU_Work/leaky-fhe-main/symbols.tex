@@ -1,0 +1,643 @@
+%%%NEW symbols
+\newcommand{\eq}{\texttt{eq}}
+\newcommand{\sign}{\texttt{sign}}
+\newcommand{\Szero}{\ensuremath{0_{\rings}}}
+\newcommand{\Sone}{\ensuremath{1_{\rings}}}
+\newcommand{\LL}{\mathcal{L}} % Set of labels
+\newcommand{\LLplus}{\ensuremath{\mathcal{L}^{+}}} % Set of labels
+\newcommand{\LLminus}{\ensuremath{\mathcal{L}^{-}}} % Set of labels
+\newcommand{\fmin}{\ensuremath{\phi_\LL}} % Label map
+
+
+
+
+\newcommand{\inputtt}{\texttt{inp}}
+\newcommand{\outputtt}{\texttt{out}}
+\newcommand{\accepttt}{\texttt{accept}}
+\newcommand{\rejecttt}{\texttt{reject}}
+\newcommand{\pp}{\texttt{pp}}
+\newcommand{\monoid}{\ensuremath{\mathbf{M}}}
+%\newcommand{\TNCpolys}{\ensuremath{R\langle\vvXX\rangle}}
+%\newcommand{\TNCpolys}{\ensuremath{R\lfloor\vvXX\rceil}}
+%\newcommand{\TNCpolys}{\ensuremath{R\abs{\vvXX}}}
+%\newcommand{\TNCpolys}{\ensuremath{R\langle\hspace{-1.1mm}\abs{\vvXX}\hspace{-1.1mm}\rangle}}
+\newcommand{\TNCpolys}{\ensuremath{R\llbracket\vvXX\rrbracket}} %Easy to confuse with power series
+\newcommand{\NCApolys}{\ensuremath{R_A[\vvXX]}}
+
+\newcommand{\TM}{T_{\mathcal{M}_n}} %Complexity for matrix multiplication.
+
+%%GKR: Wiring predicates, etc
+\newcommand{\add}[1][]{\mathtt{add}^{#1}}
+\newcommand{\mult}[1][]{\mathtt{mult}^{#1}}
+\newcommand{\tadd}[1][]{\widehat{\mathtt{add}}^{#1}}
+\newcommand{\tmult}[1][]{\widehat{\mathtt{mult}}^{#1}}
+\newcommand{\Vi}[1][i]{\ensuremath{\hat{V}^{(#1)}}}
+\newcommand{\VL}{\ensuremath{\hat{V}_L}}
+\newcommand{\VR}{\ensuremath{\hat{V}_R}}
+\newcommand{\VLi}[1][i]{\ensuremath{\hat{V}_L^{(#1)}}}
+\newcommand{\VRi}[1][i]{\ensuremath{\hat{V}_R^{(#1)}}}
+\newcommand{\VLdot}{\ensuremath{\dot{V}_L}}
+\newcommand{\VRdot}{\ensuremath{\dot{V}_R}}
+\newcommand{\VLdoti}[1][i]{\ensuremath{\dot{V}_L^{(#1)}}}
+\newcommand{\VRdoti}[1][i]{\ensuremath{\dot{V}_R^{(#1)}}}
+
+%%ZK VPD
+\newcommand{\zkVPDKeyGen}{\texttt{zkVPD.KeyGen}}
+\newcommand{\zkVPDCommit}{\texttt{zkVPD.Commit}}
+\newcommand{\zkVPDOpen}{\texttt{zkVPD.Open}}
+\newcommand{\zkVPDVerify}{\texttt{zkVPD.Verify}}
+
+%%Algorithms Linear Time Prover
+\newcommand{\Nx}{\cN_\vx}
+\newcommand{\Ny}{\cN_\vy}
+\newcommand{\Precomp}[1]{\texttt{Precompute}(#1)}
+\newcommand{\LUT}[1]{\ensuremath{\boldsymbol{T}_{#1}}}
+\newcommand{\Initone}[3]{\texttt{Initialize\_Phase\_One}(\ensuremath{#1},\ensuremath{#2},\LUT{#2},\ensuremath{\makevector{#3}})}
+\newcommand{\Initonecomb}[6]{\texttt{Initialize\_Phase\_One\_Combined}(\ensuremath{#1},\ensuremath{#2},\LUT{#2},\ensuremath{\makevector{#3}},\ensuremath{\makevector{#4}},\ensuremath{#5},\ensuremath{#6})}
+\newcommand{\Inittwo}[3]{\texttt{Initialize\_Phase\_Two}(\ensuremath{#1},\ensuremath{#2},\ensuremath{#3})}
+\newcommand{\FuncEval}[4]{\texttt{Function\_Evaluations}(\ensuremath{#1},\LUT{#2},\ensuremath{#3},\ldots,\ensuremath{#4})}
+\newcommand{\Sumcheck}[3]{\texttt{Sumcheck}(\ensuremath{#1},\LUT{#1},\ensuremath{#2},\ldots,\ensuremath{#3})}
+\newcommand{\SumcheckProd}[6]{\texttt{Sumcheck\_Product}(\ensuremath{#1},\LUT{#2},\ensuremath{#3},\LUT{#4},\ensuremath{#5},\ldots,\ensuremath{#6})}
+\newcommand{\SumcheckProdFinal}[6]{\texttt{Sumcheck\_Product}(\ensuremath{#1},\ensuremath{#2},\ensuremath{#3},\ensuremath{#4},\ensuremath{#5},\ldots,\ensuremath{#6})}
+\newcommand{\LinGKR}[6]{\texttt{Linear\_Prover\_GKR}(\ensuremath{#1},\ensuremath{#2},\ensuremath{#3},\ensuremath{#4},\ensuremath{#5},\ensuremath{#6})}
+
+
+\mathchardef\mhyphen="2D
+
+% Box environment
+% Usage: \begin{Boxfig}[placement]{Caption}{Label}{Title}
+\newenvironment{Boxfig}[4][]{
+    \begin{figure}[#1]
+    \newcommand{\FigCaption}{#2}
+    \newcommand{\FigLabel}{#3}
+    \vspace{-0.25cm}
+    \begin{center}
+        \begin{small}
+        \begin{tabular}{@{}|@{~~}l@{~~}|@{}}
+        \hline
+        \rule[-1.5ex]{0pt}{1ex}\begin{minipage}[b]{.96\linewidth}
+        \vspace{1ex}
+        \smallskip
+        \begin{center}
+        \textbf{#4}
+        \end{center}
+}
+{%
+        \end{minipage}\\
+        \hline
+        \end{tabular}
+        \end{small}
+        \vspace{-0.25cm}
+        \caption{\FigCaption}
+        \label{fig:\FigLabel}
+    \end{center}
+  \vspace{-.5cm}
+    \end{figure}
+}
+
+\mathchardef\mhyphen="2D
+
+\newtheorem{observation}{Observation}
+
+%\newtheorem{theorem}{Theorem}[section]
+%\newtheorem{corollary}{Corollary}[theorem]
+%\newtheorem{lemma}[theorem]{Lemma}
+%\newtheorem{claim}[theorem]{Claim}
+
+
+
+
+\newcommand{\asn}{:=}
+\newcommand{\sample}{\leftarrow}
+
+% Various brackets
+\newcommand{\round}[1]{\lceil #1 \rfloor}
+\newcommand{\bround}[1]{\left\lfloor #1 \right\rceil}
+\newcommand{\ceil}[1]{\lceil #1 \rceil}
+\newcommand{\floor}[1]{\lfloor #1 \rfloor}
+\newcommand{\abs}[1]{\lvert #1 \rvert}
+%\newcommand{\ang}[1]{\langle #1 \rangle}
+\newcommand{\sh}[1]{[#1]}
+\newcommand{\shl}[1]{\langle #1 \rangle}
+%\newcommand{\shL}[1]{\sh[L]{#1}}
+%\newcommand{\shR}[1]{\sh[R]{#1}}
+\newcommand{\shcomm}[1]{\llbracket #1 \rrbracket}
+\newcommand{\shG}[1]{[#1]_{\GG}}
+\newcommand{\share}[1]{[ #1 ]}
+\newcommand{\fshare}[1]{[ #1 ]_{\FF}}
+\newcommand{\rshare}[1]{[ #1 ]_{R}}
+
+
+%%% Encodings
+\newcommand{\CAFE}{\text{Circuit Amortization Friendly Encodings}}
+\newcommand\Enc{\ensuremath{\mathsf{E}}}
+\newcommand\InnerProd{\ensuremath{\mathsf{InnerProd}}}
+\newcommand\einL{\ensuremath{\Enc_{L}}}
+\newcommand\einR{\ensuremath{\Enc_{R}}}
+\newcommand\eout{\ensuremath{\Enc_{out}}}
+
+
+
+% Polynomial/negligible functions
+\newcommand{\poly}{\mathsf{poly}}
+\newcommand{\negl}{\mathsf{negl}}
+
+%%%
+%\newcommand{\F}{\mathbb{F}}
+\newcommand{\bN}{\mathbb{N}}
+\newcommand{\alg}{\F}
+\newcommand{\secpar}{\kappa}
+\newcommand{\groupgen}{\mathsf{GroupGen}}
+\newcommand{\KEnc}{\mathsf{Gen}}
+\newcommand{\enc}{\texttt{Encrypt}}
+\newcommand{\wenc}{\tilde{\mathsf{E}}}
+\newcommand{\dec}{\texttt{Decrypt}}
+\newcommand{\KeyGen}{\texttt{KeyGen}}
+\newcommand{\setup}{\mathsf{Setup}}
+\newcommand{\prove}{\mathsf{Prove}}
+\newcommand{\verify}{\mathsf{Verify}}
+\newcommand{\eval}{\mathsf{Eval}}
+\newcommand{\Rel}{\mathcal{R}}
+\newcommand{\ext}{\chi}
+\newcommand{\simu}{\mathcal{S}}
+\newcommand{\st}{\mathsf{state}}
+\newcommand{\pk}{\texttt{pk}}
+\newcommand{\sk}{\texttt{sk}}
+\newcommand{\vk}{\mathsf{vk}}
+\newcommand{\td}{\mathsf{td}}
+\newcommand{\crs}{\mathsf{crs}}
+\newcommand{\priv}{\mathsf{priv}}
+\newcommand{\scrs}{\mathsf{vcrs}}
+\newcommand{\vpoly}{v_{\mathsf{poly}}}
+\newcommand{\wpoly}{w_{\mathsf{poly}}}
+\newcommand{\ypoly}{y_{\mathsf{poly}}}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+
+%bold fonts
+\newcommand{\bG}{\mathbb{G}}
+\newcommand{\bGT}{\mathbb{G}_T}
+
+%%%%% VC%%
+\newcommand{\kgen}{\mathsf{KGen}}
+\newcommand{\probgen}{\mathsf{ProbGen}}
+\newcommand{\compute}{\mathsf{Compute}}
+\newcommand{\ver}{\mathsf{Ver}}
+% Algorithms
+
+\newcommand{\he}{\mathsf{HE}}
+\newcommand{\Decode}{\mathsf{Decode}}
+
+
+
+\newcommand{\bool}{\{0,1\}}
+\newcommand{\expVC}{\mathsf{Expt}_{\mathcal{A}}^{Ver}}
+% Vectors
+\newcommand{\makevector}[1]{{\ensuremath{\boldsymbol{#1}}}}
+%\newcommand{\makevector}[1]{{\ensuremath{\vec{#1}}}}
+\newcommand{\va}{\textbf{a}}
+\newcommand{\vb}{\textbf{b}}
+\newcommand{\vc}{\textbf{c}}
+\newcommand{\ve}{\textbf{e}}
+\newcommand{\vf}{\textbf{f}}
+\newcommand{\vg}{\textbf{g}}
+\newcommand{\vh}{\textbf{h}}
+\newcommand{\vm}{\textbf{m}}
+\newcommand{\vq}{\makevector{q}}
+\newcommand{\vp}{\makevector{p}}
+\newcommand{\vr}{\makevector{r}}
+\newcommand{\vs}{\makevector{s}}
+\newcommand{\vt}{\makevector{t}}
+\newcommand{\vTT}{\makevector{\TT}}
+\newcommand{\vu}{\makevector{u}}
+\newcommand{\vUU}{\makevector{\UU}}
+\newcommand{\vv}{\makevector{v}}
+\newcommand{\vw}{\makevector{w}}
+\newcommand{\vWW}{\makevector{\WW}}
+\newcommand{\vx}{\makevector{x}}
+\newcommand{\vXX}{\makevector{\XX}}
+\newcommand{\vvXX}{\XX_1, \ldots, \XX_n}
+\newcommand{\vYY}{\makevector{\YY}}
+\newcommand{\vZvar}{\makevector{\Zvar}}
+\newcommand{\vy}{\makevector{y}}
+\newcommand{\vz}{\makevector{z}}
+\newcommand{\vdelta}{\makevector{\delta}}
+\newcommand{\vchi}{\makevector{\chi}}
+\newcommand{\vpsi}{\makevector{\psi}}
+
+% Polynomial-related
+% \newcommand{\EvR}[2]{\Epsilon_{#2}(#1)}
+% \newcommand{\EvL}[2]{{}_{#2}\Epsilon(#1)}
+\newcommand{\Ev}[2]{\mathtt{Ev}_{#2}(#1)}
+\newcommand{\EvR}[2]{{#1}^{\textsf{R}}(#2)}
+\newcommand{\EvL}[2]{{#1}^{\textsf{L}}(#2)}
+\newcommand{\UU}{\mathtt{U}}
+\newcommand{\WW}{\mathtt{W}}
+\newcommand{\XX}{\mathtt{X}}
+\newcommand{\YY}{\mathtt{Y}}
+\newcommand{\Zvar}{\mathtt{Z}}
+\newcommand{\TT}{\mathtt{T}}
+
+
+% Matrices
+
+\newcommand{\makematrix}[1]{{\ensuremath{\mathbf{#1}}}}
+\newcommand{\Diag}{\mathsf{Diag}}
+\newcommand{\matA}{\makematrix{A}}
+\newcommand{\mM}{\makematrix{M}}
+%\newcommand{\mC}{\makematrix{C}}
+\newcommand{\mD}{\makematrix{D}}
+%\newcommand{\mH}{\makematrix{h}}
+%\newcommand{\mQ}{\makematrix{q}}
+%\newcommand{\mT}{\makematrix{t}}
+%\newcommand{\mZ}{\makematrix{z}}
+%\newcommand{\mH}{\makevector{H}}
+\newcommand{\mQ}{\makevector{Q}}
+\newcommand{\mT}{\makevector{T}}
+\newcommand{\mZ}{\makevector{Z}}
+\newcommand{\mOne}{\makematrix{1}}
+\newcommand{\mZero}{\makematrix{0}}
+
+
+\newcommand{\PRF}{\mathsf{PRF}}
+\newcommand{\PRG}{\mathsf{PRG}}
+\newcommand{\hash}{\mathsf{H}}
+
+\newcommand{\OT}{{\mathsf{OT}}}
+
+\newcommand{\PSOne}{\mathcal{C}}
+
+
+
+% Adversaries etc.
+\newcommand{\Env}{\mathcal{Z}}
+\newcommand{\Sim}{\mathcal{S}}
+\newcommand{\Adv}{\mathcal{A}}
+%\newcommand{\A}{\mathcal{A}}
+\newcommand{\adv}{\mathcal{A}}
+\newcommand{\bdv}{\mathcal{B}}
+\renewcommand{\ext}{{\chi}}
+%\newcommand{\ct}{\mathsf{C}}
+\newcommand{\evk}{\texttt{evk}}
+\newcommand{\keyswitch}{\texttt{KeySwitch}}
+\newcommand{\premult}{\texttt{Pre-Multiply}}
+%\newcommand{\scale}{\texttt{Rescale}}
+\newcommand{\rings}{\mathcal{S}}
+\newcommand{\plushe}{+_{\text{HE}}}
+\newcommand{\plushei}{+_{\text{HE}_i}}
+\newcommand{\pluslev}[1]{+_{\text{HE}_{#1}}}
+\newcommand{\timeshe}{\times_{\text{HE}}}
+\newcommand{\timeshei}{\times_{\text{HE}_i}}
+\newcommand{\timeslev}[1]{\times_{\text{HE}_{#1}}}
+
+\newcommand{\AddMAC}{\mathsf{AddMAC}}
+\newcommand{\InputMAC}{\mathsf{MACPrivateInput}}
+\newcommand{\AddMACT}{2\mhyphen \mathsf{AddMAC}}
+\newcommand{\AddMACn}{n\mhyphen \mathsf{Bracket}}
+%\newcommand{\Add}{\mathsf{Add}}
+
+
+% Protocols
+\newcommand{\Prot}[1]{\ensuremath{\Pi_{\scriptstyle\mathrm{#1}}}}
+\newcommand{\PPrep}{\Prot{Prep}}
+\newcommand{\PPrepCheck}{\Prot{PrepCheck}}
+\newcommand{\PRand}{\Prot{Rand}}
+\newcommand{\PMPC}{\Prot{MPC}}
+\newcommand{\POpen}{\Prot{Open}}
+\newcommand{\Pshcomm}{\Prot{\shcomm{\cdot}}}
+\newcommand{\Psh}{\Prot{\sh{\cdot}}}
+\newcommand{\Pshl}{\Prot{\shl{\cdot}}}
+
+% Functionalities
+\newcommand{\Func}[1]{\ensuremath{\mathcal{F}_{\scriptstyle\mathrm{#1}}}}
+\newcommand{\Fauth}{\Func{\spdz{\cdot}}}
+\newcommand{\FCT}{\Func{CoinToss}}
+\newcommand{\Fthree}[1]{\Func{3PC}(#1)}
+\newcommand{\Ftriples}{\Func{Triples}}
+
+
+% Commands for functionalities
+\newcommand{\FCommand}[1]{\ensuremath{\mathtt{#1}}}
+\newcommand{\id}{\FCommand{id}}
+\newcommand{\Val}[1]{\FCommand{Val}[#1]}
+\newcommand{\Input}{\FCommand{Input}}
+\newcommand{\Output}{\FCommand{Output}}
+\newcommand{\Triple}{\FCommand{Triple}}
+%\newcommand{\Mult}{\FCommand{Multiply}}
+\newcommand{\coin}{\FCommand{Toss}}
+\renewcommand{\check}{\FCommand{Check}}
+\newcommand{\commit}{\FCommand{Commit}}
+\newcommand{\ok}{\FCommand{ok}}
+%\newcommand{\GO}{\mathit{GO}}
+%\newcommand{\NOGO}{\mathit{NO{\mhyphen}GO}}
+\newcommand{\Prep}{\FCommand{Prep}}
+
+
+%
+% Referencing
+%
+\newcommand{\appref}[1]{Appendix~\ref{app:#1}}
+\newcommand{\lemmaref}[1]{Lemma~\ref{lem:#1}}
+\newcommand{\figref}[1]{Figure~\ref{fig:#1}}
+\renewcommand{\eqref}[1]{(\ref{eq:#1})}
+\newcommand{\tabref}[1]{Table~\ref{tab:#1}}
+\newcommand{\secref}[1]{Section~\ref{sec:#1}}
+\newcommand{\protref}[1]{Protocol~\ref{alg:#1}}
+\newcommand{\figlab}[1]{\label{fig:#1}}
+
+% use this to number a single line of align* equations
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+
+\newenvironment{boxfig}[2]{% {#1}{#2} = {Caption}{label}
+     \begin{figure}
+     \newcommand{\FigCaption}{#1}
+     \newcommand{\FigLabel}{#2}
+       \vspace{-.30cm}
+     \begin{center}
+       \begin{small}
+         \begin{tabular}{@{}|@{~~}l@{~~}|@{}}
+           \hline
+           %\rule[-1ex]{0pt}{1ex}\begin{minipage}[!htb]{\textwidth}
+            \rule[-1.5ex]{0pt}{1ex}\begin{minipage}[b]{.96\linewidth}
+             \vspace{1ex}
+             \smallskip
+             }{%
+           \end{minipage}\\
+           \hline
+         \end{tabular}
+       \end{small}
+        \vspace{-0.25cm}
+       \caption{\FigCaption}
+       \figlab{\FigLabel}
+     \end{center}
+     \vspace{-.2cm}
+   \end{figure}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%    Caligraphic Alphabet  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\cA}{{\cal A}}
+\newcommand{\cB}{{\cal B}}
+\newcommand{\cC}{{\cal C}}
+\newcommand{\cD}{{\cal D}}
+\newcommand{\cE}{{\cal E}}
+\newcommand{\cF}{{\cal F}}
+\newcommand{\cG}{{\cal G}}
+\newcommand{\cH}{{\cal H}}
+\newcommand{\cI}{{\cal I}}
+\newcommand{\cK}{{\cal K}}
+\newcommand{\cL}{{\cal L}}
+\newcommand{\cM}{{\cal M}}
+\newcommand{\cN}{{\cal N}}
+\newcommand{\cO}{{\cal O}}
+\newcommand{\cP}{{\cal P}}
+\newcommand{\cQ}{{\cal Q}}
+\newcommand{\cR}{{\cal R}}
+\newcommand{\cS}{{\cal S}}
+\newcommand{\cT}{{\cal T}}
+\newcommand{\cU}{{\cal U}}
+\newcommand{\cV}{{\cal V}}
+\newcommand{\cX}{{\cal X}}
+\newcommand{\cY}{{\cal Y}}
+\newcommand{\cZ}{{\cal Z}}
+\newcommand{\cW}{{\cal W}}
+
+\newcommand{\Gen}{{\cal G}}
+\newcommand{\Prover}{{\cal P}}
+\newcommand{\Verifier}{{\cal V}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Blackboard Bold Alphabet %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand{\AA}{\mathbf{A}}
+\newcommand{\BB}{\mathbb{B}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\FF}{\mathbb{F}}
+\newcommand{\GG}{\mathbb{G}}
+\newcommand{\HH}{\mathbb{H}}
+\newcommand{\KK}{\mathbb{K}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\RR}{\mathbb{R}}
+%\newcommand{\TT}{\mathbb{T}}
+\newcommand{\ZZ}{\mathbb{Z}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Boldface Math Alphabet %
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def \bfa{{\mathbf a}}
+\def \bfb{{\mathbf b}}
+\def \bfc{{\mathbf c}}
+\def \bfe{{\mathbf e}}
+\def \bff{{\mathbf f}}
+\def \bfg{{\mathbf g}}
+\def \bfm{{\mathbf m}}
+\def \bfp{{\mathbf p}}
+\def \bfr{{\mathbf r}}
+\def \bfs{{\mathbf s}}
+\def \bft{{\mathbf t}}
+\def \bfu{{\mathbf u}}
+\def \bfv{{\mathbf v}}
+\def \bfw{{\mathbf w}}
+\def \bfx{{\mathbf x}}
+\def \bfy{{\mathbf y}}
+\def \bfz{{\mathbf z}}
+\def \bfA{{\mathbf A}}
+\def \bfH{{\mathbf H}}
+\def \bfZ{{\mathbf Z}}
+\def \bfS{{\mathbf S}}
+\def \wb{{\widehat{b}}}
+
+% Some specific rings
+\newcommand{\GR}{\mathsf{GR}}
+\newcommand{\Ztwok}{\ensuremath{\mathbb{Z}_{2^k}}}
+\newcommand{\MatRing}[3]{\mathcal{M}_{#1 \times #2}(#3)}
+\newcommand{\SqMat}[1]{\mathcal{M}_{#1 \times #1}}
+\newcommand{\Mn}[1]{\mathcal{M}_{n \times n}(#1)}
+\newcommand{\Mparties}[1]{\mathcal{M}_{n \times n}(#1)}
+\newcommand{\MnR}{\Mn{R}}
+\newcommand{\MZtwok}{\Mn{\Ztwok}}
+\newcommand{\Mthree}[1]{\mathcal{M}_{3 \times 3}(#1)}
+\newcommand{\MthreeR}{\Mthree{R}}
+
+%FHE-land
+%\newcommand{\sk}{\texttt{sk}}
+%\newcommand{\pk}{\texttt{pk}}
+\newcommand{\ct}{\texttt{ct}}
+\newcommand{\ksd}{\texttt{ksd}}
+\newcommand{\erfc}{\texttt{erfc}}
+\newcommand{\erf}{\texttt{erf}}
+\newcommand{\erfinv}{\texttt{erf}^{-1}}
+\newcommand{\lev}{t}
+\newcommand{\ql}{{q_{\lev}}}
+\newcommand{\BGV}{^\mathsf{BGV}}
+\newcommand{\FV}{^\mathsf{FV}}
+\newcommand{\CRT}{\mathsf{CRT}}
+\newcommand{\clean}{\mathsf{clean}}
+\newcommand{\ReduceLevel}{{\mathsf{ReduceLevel}}}
+\newcommand{\scale}{{\texttt{Scale}}} 
+\newcommand{\scalenew}{{\mathsf{Scale_{VC}}}}
+\newcommand{\realmodred}{{\mathsf{RealModRed}}} 
+\newcommand{\SwitchKey}{\mathsf{SwitchKey}}
+\newcommand{\SwitchKeyGen}{\mathsf{SwitchKeyGen}}
+%\newcommand{\asn}{\leftarrow}
+%\newcommand{\cK}{c_m}
+\newcommand{\can}{\mathsf{can}}
+\newcommand{\phim}{\phi(m)}
+\newcommand{\BKs}[3]{B_\mathsf{Ks,#2}#1(#3)}
+\newcommand{\dt}{\mathfrak{d}}
+\newcommand{\Add}{\mathsf{Add}}
+\newcommand{\Mult}{\mathsf{Mult}}
+%\newcommand{\Decode}{\mathsf{Decode}}
+\newcommand{\Encr}{\ensuremath{\texttt{Enc}}}
+\newcommand{\Decr}{\ensuremath{\texttt{Dec}}}
+\newcommand{\Eval}{\ensuremath{\texttt{Eval}}}
+\newcommand{\ring}{\mathcal{R}}
+\newcommand{\realmod}[1]{\RR_{[-#1, #1)}}
+\newcommand{\newring}{\mathcal{S}}
+
+%Distributions
+\newcommand{\calU}{\mathcal{U}}
+\newcommand{\calD}{\mathcal{D}}
+\newcommand{\calN}{\mathcal{N}}
+\newcommand{\dN}{\mathcal{DG}}
+\newcommand{\HWT}{\mathcal{HWT}}
+\newcommand{\ZO}{\mathcal{ZO}}
+
+
+%\newtheorem{thm}{Theorem}%[section]      % A counter for Theorems etc
+\newcommand{\BT}{\begin{thm}}   \newcommand{\ET}{\end{thm}}
+%\newtheorem{dfn}[thm]{Definition}      %
+\newcommand{\BD}{\begin{dfn}}   \newcommand{\ED}{\end{dfn}}
+%\newtheorem{cor}[thm]{Corollary}      %
+\newcommand{\BCR}{\begin{cor}} \newcommand{\ECR}{\end{cor}}
+%---
+%\newtheorem{Ithm}{Theorem}[section]     % A counter for Theorems in Intro
+\newcommand{\BIT}{\begin{Ithm}}   \newcommand{\EIT}{\end{Ithm}}
+%---
+%\newtheorem{lem}{Lemma}%[section]  % A counter for Lemmas etc
+\newcommand{\BL}{\begin{lem}}   \newcommand{\EL}{\end{lem}}
+%\newtheorem{prop}[lem]{Proposition}
+\newcommand{\BP}{\begin{prop}}   \newcommand{\EP}{\end{prop}}
+%\newtheorem{clm}[lem]{Claim}            %
+\newcommand{\BCM}{\begin{clm}}   \newcommand{\ECM}{\end{clm}}
+%\newtheorem{fact}[lem]{Fact}            %
+\newcommand{\BF}{\begin{fact}}   \newcommand{\EF}{\end{fact}}
+%\newenvironment{proof}{\noindent{\bf Proof:~~}}{\qed}
+\newcommand{\BPF}{\begin{proof}} \newcommand {\EPF}{\end{proof}}
+\newtheorem{prot}{Protocol}      % A counter for Protocols
+\newenvironment{sproof}{\noindent{\bf Proof Sketch:~~}}{\qed}
+\newcommand{\BPFS}{\begin{sproof}} \newcommand {\EPFS}{\end{sproof}}
+\newcommand{\BPR}{\begin{prot}}   \newcommand{\EPR}{\end{prot}}
+\newenvironment{cproof}{\noindent{\bf Proof:~~}}{\hfill $\Box$}
+\newcommand{\BCPF}{\begin{cproof}} \newcommand {\ECPF}{\end{cproof}}
+\newcommand{\Qed}{\hfill $\Box$}
+
+\newcommand{\BDE}{\begin{description}}
+\newcommand{\EDE}{\end{description}}
+\newcommand{\BE}{\begin{enumerate}}
+\newcommand{\EE}{\end{enumerate}}
+\newcommand{\BI}{\begin{itemize}}
+\newcommand{\EI}{\end{itemize}}
+\newcommand{\BEQ}{\begin{eqnarray*}}
+\newcommand{\EEQ}{\end{eqnarray*}}
+\def\blackslug
+{\hbox{\hskip 1pt\vrule width 8pt height 8pt depth 1.5pt\hskip 1pt}}
+\def\qed{\quad\blackslug\lower 8.5pt\null\par}
+
+
+\newcommand{\defeq}{\coloneqq}
+\newcommand{\indist}{\stackrel{\rm c}{\approx}}
+\newcommand{\prob}{{\rm Pr}}
+\newcommand{\bits}{\{0,1\}}
+\newcommand{\ppt}{{\sc PPT}}
+\newcommand{\view}{\bf View}
+\newcommand{\ideall}{\mathbf{IDEAL}}
+\newcommand{\hyb}{{\mathbf{HYB}}}
+\newcommand{\Hyb}{{\mathbf{H}}}
+\newcommand{\reall}{\mathbf{REAL}}
+\newcommand{\wreall}{\widetilde{\mathbf{REAL}}}
+\newcommand{\whyb}{\widetilde{\mathbf{HYB}}}
+\newcommand{\wideall}{\widetilde{\mathbf{IDEAL}}}
+\newcommand{\circc}{\mathsf{Circ}}
+\newcommand{\rand}{\mathsf{Rand}}
+\newcommand{\flip}{\mathsf{Flip}}
+\newcommand{\guess}{\mathsf{Guess}}
+\newcommand{\brho}{\boldsymbol{\rho}}
+\newcommand{\wsim}{\widetilde{\Sim}}
+
+%%%%%
+
+
+\newtheorem{construction}{Construction}{\bfseries}{\rmfamily}
+
+
+%\newcommand{\F}{\mathbb{F}}                
+\newcommand{\Z}{\mathbb{Z}}                
+
+\renewcommand{\O}{\operatorname{\mathcal{O}}}   % big-O notation
+
+%%Eduardo: Note the \renewcommand for \prot
+\renewcommand{\prot}[1]{\ensuremath{\mathsf{#1}}\xspace}
+\newcommand{\Share}{\prot{Share}}
+\newcommand{\ShareConv}{\prot{ShareConversion}}
+\newcommand{\Rec}{\prot{ReconsPriv}}
+\newcommand{\RecP}{\prot{ReconsPubl}}
+\newcommand{\RecA}{\prot{ReconsAsync}}
+\newcommand{\DoubleSh}{\prot{DoubleShareRandom}}
+\newcommand{\PrepPhase}{\prot{PreparationPhase}}
+\newcommand{\CompPhase}{\prot{ComputationPhase}}
+\newcommand{\GiveInput}{\prot{GiveInput}}
+\newcommand{\InputPhase}{\prot{InputPhase}}
+\newcommand{\CheckAlive}{\prot{CheckAlive}}
+\newcommand{\BCU}{\prot{Broadcast}}
+
+
+\newenvironment{mylist}[1][$\bullet$]%
+{\begin{list}{$\bullet$}{\labelwidth=5cm\settowidth{\leftmargin}{#1}%
+			\addtolength{\leftmargin}{.8em}\itemsep=0pt\parsep=.5ex\topsep=0pt}}%
+	{\end{list}}
+
+\long\def\protocolbeg#1#2#3\item{%
+	\paragraph*{\normalfont\bfseries Protocol #2.}
+	\vspace*{0pt}\mbox{}\par\noindent\ignorespaces #3 \ignorespaces%
+	\begin{list}{$\bullet$}{\labelwidth=5cm\settowidth{\leftmargin}{#1}%
+			\addtolength{\leftmargin}{.8em}\itemsep=0pt\parsep=.5ex\topsep=0pt%
+			\partopsep=0pt}%
+		\item}
+	\newenvironment{protocol}[2][$\bullet$]{\protocolbeg{#1}{#2}}%
+	{\end{list}\medskip}
+
+\newenvironment{costs}{\par\noindent\emph{Costs:}}{\par}
+
+%%%%Actual new commands for this paper
+\newcommand{\size}[1]{|#1|}
+\newcommand\restr[2]{{% we make the whole thing an ordinary symbol
+		\left.\kern-\nulldelimiterspace % automatically resize the bar with \right
+		#1 % the function
+		\vphantom{\big|} % pretend it's a little taller at normal size
+		\right|_{#2} % this is the delimiter
+}}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "main"
+%%% End:
+
+%\usepackage{xparse}
+
+\NewDocumentCommand{\INTERVALINNARDS}{ m m }{
+	#1 {,} #2
+}
+\NewDocumentCommand{\interval}{ s m >{\SplitArgument{1}{,}}m m o }{
+	\IfBooleanTF{#1}{
+		\left#2 \INTERVALINNARDS #3 \right#4
+	}{
+		\IfValueTF{#5}{
+			#5{#2} \INTERVALINNARDS #3 #5{#4}
+		}{
+			#2 \INTERVALINNARDS #3 #4
+		}
+	}
+}
+

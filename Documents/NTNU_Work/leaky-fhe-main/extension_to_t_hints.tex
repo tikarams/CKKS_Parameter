@@ -1,0 +1,210 @@
+\documentclass[12pt]{article}
+\usepackage[paper=letterpaper,margin=2cm]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{newtxtext, newtxmath}
+\usepackage{enumitem}
+\usepackage{titling}
+\usepackage[colorlinks=true]{hyperref}
+
+\setlength{\droptitle}{-6em}
+
+% Enter the specific assignment number and topic of that assignment below, and replace "Your Name" with your actual name.
+\title{An extension to t hints}
+\author{Rui Tang}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+Suppose there are t hints invloved, namely
+$$
+H=
+\begin{bmatrix}
+R&0 \\
+0&R
+\end{bmatrix}
+\begin{bmatrix}
+A_{1}^1&A_{1}^2&\dots&A_{1}^t \\
+A_{2}^1&A_{2}^2&\dots&A_{2}^t
+\end{bmatrix}
+\begin{bmatrix}
+R^{-1} &  &  \\  
+  & \ddots  &  \\
+ &  & R^{-1}
+\end{bmatrix},
+$$
+
+where $RR^{T}=nI_n$, $R^{-1}(R^T)^{-1}=\frac{1}{n}I_n$, and $R$ is an orthogonal matrix scaled by $\sqrt{n}$. Then,
+
+\begin{align*}
+\quad&\det \left( H^{T}\Sigma H+\Sigma_{\epsilon} \right)\\
+=&\det\left( I_{2n}+\frac{1}{\sigma_{\epsilon}^2}\Sigma^{1/2}HH^T\Sigma^{1/2} \right)\det(\Sigma_{\epsilon})\\
+=&\det\left( I_{2n}+\frac{1}{\sigma_{\epsilon}^2}
+\begin{bmatrix}
+R\left( \frac{1}{n}\sigma_{s}^2\sum_{j=1}^t A_{1}^j(A_{1}^{j})^T \right)R^T & R\left( \frac{1}{n}\sigma_{s}\sigma_{e}\sum_{j=1}^t A_{1}^j(A_{2}^{j})^T \right)R^T \\
+R\left( \frac{1}{n}\sigma_{s}\sigma_{e}\sum_{j=1}^t A_{2}^j(A_{1}^{j})^T \right)R^T & R\left( \frac{1}{n}\sigma_{e}^2\sum_{j=1}^t A_{2}^j(A_{2}^{j})^T \right)R^T
+\end{bmatrix}
+\right)\det(\Sigma_{\epsilon})\\
+=&\det \left( 
+\begin{bmatrix}
+\frac{\sigma_{s}^2}{\sigma_{\epsilon}^2}\sum_{j=1}^t A_{1}^j(A_{1}^{j})^T+I_{n}  & \frac{\sigma_{s}\sigma_{e}}{\sigma_{\epsilon}^2}\sum_{j=1}^t A_{1}^j(A_{2}^{j})^T  \\
+ \frac{\sigma_{s}\sigma_{e}}{\sigma_{\epsilon}^2}\sum_{j=1}^t A_{2}^j(A_{1}^{j})^T  &  \frac{\sigma_{e}^2}{\sigma_{\epsilon}^2}\sum_{j=1}^t A_{2}^j(A_{2}^{j})^T+I_{n} 
+\end{bmatrix}
+\right)\det(\Sigma_{\epsilon})\\
+\stackrel{(a)}{=}&\det
+\begin{bmatrix}
+S_{1} & 0 & \dots & 0 &  0 \\
+0 & S_{2} & \dots & 0 & 0 \\
+\vdots & \vdots & \ddots & \vdots & \vdots \\
+0 & 0 & \dots & S_{\frac{n}{2}-1} & 0 \\
+0 & 0 & \dots & 0 & S_{\frac{n}{2}}
+\end{bmatrix}\det(\Sigma_{\epsilon})\\
+=&\det(\Sigma_{\epsilon})\prod_{i=1}^{n/2}\det(S_{i})\\
+=&\sigma_\epsilon^{2tn}\prod_{i=1}^{n/2}
+\frac{\sigma_{s}^4\sigma_{e}^4}{16\sigma_{\epsilon}^{8}}
+\Bigg( 
+\left( \sum_{j=1}^t\left( (V_{i,h_{s}}^{j})^2+(V_{n-i,h_{s}}^{j})^2\right)+\frac{2\sigma^2_\epsilon}{\sigma_s^2} \right) \left( \sum_{j=1}^t\left( (V_{i,h_{e}}^{j})^2+(V_{n-i,h_{e}}^{j})^2\right)+\frac{2\sigma^2_\epsilon}{\sigma_e^2} \right) \\
+\quad&-
+\left( \sum_{j=1}^t\left( V_{i,h_{s}}^{j}V_{i,h_{e}}^j+V_{n-i,h_{s}}^{j}V_{n-i,h_{e}}^j\right) \right)^2 
+-
+\left( \sum_{j=1}^t\left( V_{i,h_{s}}^{j}V_{n-i,h_{e}}^j-V_{i,h_{e}}^{j}V_{n-i,h_{s}}^j\right) \right) ^2
+\Bigg) ^2\\
+=&\left(\frac{\sigma^4_s\sigma^4_e}{16\sigma^{8-4t}_\epsilon}\right)^{\frac{n}{2}}\prod_{i=1}^{\frac{n}{2}}\Bigg(
+\sum_{1\leq j\neq k \leq t}\Bigg(
+\left(V_{i,h_s}^j V_{i,h_e}^k \right)^2 +
+\left(V_{i,h_s}^j V_{n-i,h_e}^k \right)^2 +
+\left(V_{n-i,h_s}^j V_{i,h_e}^k \right)^2 +
+\left(V_{n-i,h_s}^j V_{n-i,h_e}^k \right)^2 \\
+\quad&-
+\left( V_{i,h_s}^j V_{i,h_e}^j V_{i,h_s}^k V_{i,h_e}^k +
+V_{n-i,h_s}^j V_{n-i,h_e}^j V_{n-i,h_s}^k V_{n-i,h_e}^k +
+V_{i,h_s}^j V_{n-i,h_e}^j V_{i,h_s}^k V_{n-i,h_e}^k +
+V_{n-i,h_s}^j V_{i,h_e}^j V_{n-i,h_s}^k V_{n-i,h_e}^k
+\right)
+\Bigg)\\
+\quad&+\frac{2\sigma_\epsilon^2}{\sigma_s^2} \sum_{j=1}^t 
+\left(
+\left( (V_{i,h_e}^j \right)^2 +
+\left( (V_{n-i,h_e}^j \right)^2
+\right)
++\frac{2\sigma_\epsilon^2}{\sigma_e^2} \sum_{j=1}^t 
+\left(
+\left( (V_{i,h_s}^j \right)^2 +
+\left( (V_{n-i,h_s}^j \right)^2 
+\right)
++4\frac{\sigma_\epsilon^4}{\sigma_s^2\sigma_e^2}
+\Bigg)^2,
+\end{align*}
+
+where
+$$
+\det S_{i}
+=\det
+\begin{bmatrix}
+a_{i} & 0 & c_{i} & -d_{i} \\
+0 & a_{i} & d_{i} & c_{i} \\
+c_{i} & d_{i} & b_{i} & 0 \\
+-d_{i} & c_{i} & 0 & b_{i}
+\end{bmatrix}
+=\det
+\begin{bmatrix}
+A & B \\
+C & D 
+\end{bmatrix}
+=\det
+(AD-BC),
+$$
+$$
+\det
+(AD-BC)
+=\det
+\left( 
+\begin{bmatrix}
+a_{i}b_{i} & 0 \\
+0 & a_{i}b_{i} 
+\end{bmatrix}-
+\begin{bmatrix}
+c_{i} & -d_{i} \\
+d_{i} & c_{i}
+\end{bmatrix}
+\begin{bmatrix}
+c_{i} & d_{i} \\
+-d_{i} & c_{i}
+\end{bmatrix}
+\right) 
+=(a_{i}b_{i}-c_{i}^2-d_{i}^2)^2,
+$$
+$$
+a_{i}=\frac{\sigma_{s}^2}{2\sigma_{\epsilon}^2}\sum_{j=1}^t\left( (V_{i,h_{s}}^{j})^2+(V_{n-i,h_{s}}^{j})^2+\frac{2\sigma_\epsilon^2}{\sigma_s^2}\right),
+$$
+$$
+b_{i}=\frac{\sigma_{e}^2}{2\sigma_{\epsilon}^2}\sum_{j=1}^t\left( (V_{i,h_{e}}^{j})^2+(V_{n-i,h_{e}}^{j})^2+\frac{2\sigma_\epsilon^2}{\sigma_e^2}\right),
+$$
+$$
+c_{i}=\frac{\sigma_{s}\sigma_{e}}{2\sigma_{\epsilon}^2}\sum_{j=1}^t\left( V_{i,h_{s}}^{j}V_{i,h_{e}}^j+V_{n-i,h_{s}}^{j}V_{n-i,h_{e}}^j\right),
+$$
+$$
+d_{i}=\frac{\sigma_{s}\sigma_{e}}{2\sigma_{\epsilon}^2}\sum_{j=1}^t\left( V_{i,h_{s}}^{j}V_{n-i,h_{e}}^j-V_{i,h_{e}}^{j}V_{n-i,h_{s}}^j\right).
+$$
+
+
+
+Identify
+\begin{align*}
+    Y_i:=&\,\sum_{1\leq j\neq k \leq t}\Bigg(
+\left(V_{i,h_s}^j V_{i,h_e}^k \right)^2 +
+\left(V_{i,h_s}^j V_{n-i,h_e}^k \right)^2 +
+\left(V_{n-i,h_s}^j V_{i,h_e}^k \right)^2 +
+\left(V_{n-i,h_s}^j V_{n-i,h_e}^k \right)^2 \\
+-&
+\left( V_{i,h_s}^j V_{i,h_e}^j V_{i,h_s}^k V_{i,h_e}^k +
+V_{n-i,h_s}^j V_{n-i,h_e}^j V_{n-i,h_s}^k V_{n-i,h_e}^k +
+V_{i,h_s}^j V_{n-i,h_e}^j V_{i,h_s}^k V_{n-i,h_e}^k +
+V_{n-i,h_s}^j V_{i,h_e}^j V_{n-i,h_s}^k V_{n-i,h_e}^k
+\right)
+\Bigg)\\
+\quad&+\frac{2\sigma_\epsilon^2}{\sigma_s^2} \sum_{j=1}^t 
+\left(
+\left( (V_{i,h_e}^j \right)^2 +
+\left( (V_{n-i,h_e}^j \right)^2
+\right)
++\frac{2\sigma_\epsilon^2}{\sigma_e^2} \sum_{j=1}^t 
+\left(
+\left( (V_{i,h_s}^j \right)^2 +
+\left( (V_{n-i,h_s}^j \right)^2 
+\right)
++4\frac{\sigma_\epsilon^4}{\sigma_s^2\sigma_e^2}.
+\end{align*}
+
+Since  $\{V_{i,h_s}^j\}_{j=1;i=1}^{t;n}$ and $\{V_{i,h_e}^j\}_{j=1;i=1}^{t;n}$ are mutually independent, the expectation of the product is the product of each expectation,
+$$\mathbb{E}\det \left( H^{T}\Sigma H+\Sigma_{\epsilon}\right)
+=\left(\frac{\sigma_s^4\sigma_e^4}{16\sigma_\epsilon^{8-4t}}\right)^{\frac{n}{2}}\prod_{i=1}^{\frac{n}{2}}\mathbb{E}Y^2
+=\left(\frac{\sigma_s^4\sigma_e^4}{16\sigma_\epsilon^{8-4t}}\right)^{\frac{n}{2}}\prod_{i=1}^{\frac{n}{2}}\left(\textrm{Var} Y+\mathbb{E}^2Y\right),
+$$
+where
+$$
+\textrm{Var} Y=28t(t-1)n^4\sigma_{h_s}^4\sigma_{h_e}^4+16tn^2\sigma_\epsilon^4(\frac{\sigma_{h_s}^4}{\sigma_e^4}+\frac{\sigma_{h_e}^4}{\sigma_s^4}),
+$$
+$$
+\mathbb{E}^2Y=\left(4t(t-1)n^2\sigma_{h_s}^2\sigma_{h_e}^2+4tn\sigma_\epsilon^2(\frac{\sigma_{h_s}^2}{\sigma_e^2}+\frac{\sigma_{h_e}^2}{\sigma_s^2})+4\frac{\sigma_\epsilon^4}{\sigma_s^2\sigma_e^2}
+\right)^2.
+$$
+Then
+\begin{align*}
+\quad&\mathbb{E}\det \left( H^{T}\Sigma H+\Sigma_{\epsilon}\right)\\
+=&\left(\sigma_{s}^4\sigma_{e}^4\sigma_\epsilon^{4t-8}\left(
+\frac{7}{4}t(t-1)n^4\sigma_{h_s}^4\sigma_{h_e}^4+tn^2\sigma_\epsilon^{4}(\frac{\sigma_{h_s}^4}{\sigma_e^4}+\frac{\sigma_{h_e}^4}{\sigma_s^4})
++
+\left(
+t(t-1)n^2\sigma_{h_s}^2\sigma_{h_e}^2+tn\sigma_\epsilon^2(\frac{\sigma_{h_s}^2}{\sigma_e^2}+\frac{\sigma_{h_e}^2}{\sigma_s^2})+\frac{\sigma_{\epsilon}^4}{\sigma_s^2\sigma_e^2}
+\right)^2
+\right)
+\right)^{\frac{n}{2}}.
+\end{align*}
+
+
+
+\end{document}
+
