@@ -1,0 +1,90 @@
+% !TeX root = ../sameplaper.tex
+% !TeX spellcheck = en_US
+
+\chapter{Leakages}
+\setcounter{section}{0}
+
+
+\textcolor{blue} {Assumption:} Whatever is known or inferred from the output of the computation is not considered as a leakage. Something known by an entity that is not meant to be known means leakage.
+
+In the proposed FHE computation environment everything is computed inside TEE and before computation TEE checks genuineness of the data and circuit obtained for computation. Thus, even if any component tries to perform an active attack on FHE computation, he/she will be caught in the TEE checking phase performed before the circuit computation.  Unless a genuine user acts as an attacker and uses a special circuit to extract secret information using the help of \textcolor{blue} {decryption failure.}
+
+\textcolor{blue} {Assumption:} Service Query Portal cannot change signature of a query with another users/his own signature. In such a case even, the circuit can be changed by an active attacker and the TEE will assume that he is computing the correct circuit.
+
+
+\section{Attack on API gateway}
+This kind of attack can be avoided by using two-way authentication as mentioned below in the leakage section.
+
+This can be avoided using secure channel communication. So that attacker cannot change anything when two parties communicate with each other.
+
+
+Below we have tried to study diffent entites and their information Leakages:
+
+\subsection{Query Service Client}
+\begin{itemize}
+    \item The attacker may try to steal login information of user by impersonation attack (attempt to gain unauthorized access to systems by masquerading as authorized users)
+          \begin{itemize}
+              \item These types of attacks can be restricted by using additional layer of authentication in the form of OTP to use the facility.
+          \end{itemize}
+    \item Eavesdrop the communication link, modify the communicated data or prevent the communication between the two
+          \begin{itemize}
+              \item These types of attack can be prevented using secure communication link between the communication parties.
+          \end{itemize}
+    \item Attackers may use feedback system to steal login credential
+          \begin{itemize}
+              \item Attacker may try to perform social engineering or brute force attack techniques to guess login credential of any authorized user in combination with feedback system.
+              \item However, as mentioned above the use of OTP based login nullifies these attack techniques
+          \end{itemize}
+\end{itemize}
+
+\subsection{Service Query Portal}
+\begin{itemize}
+    \item Query well formedness is checked by computing
+          \begin{itemize}
+              \item Whether the query is correctly formed or not by checking query is encrypted by a valid user or not, metadata used in the query is correct or not, service parameters are correct or not etc.
+              \item \textcolor{blue}{However how to check whether the user has used more error to form a query to make decryption failure type of attack.}
+          \end{itemize}
+    \item \textcolor{blue}{Knows query frequency of institution/user}
+    \item Use feedback to extract secret information (Leakage by feedback message)
+          \begin{itemize}
+              \item Feedback messages send from service query portal to the user is of authentication failed message. The user whoever encrypted the query must be a genuine user as he has to login to the client service portal to form a query. Thus, the user who ever successfully encrypts the query is a genuine user, so feedback reveals no extra information to the genuine user.
+              \item Additionally, the user comes to know by the feedback message if any active attack is going on the service side.
+          \end{itemize}
+\end{itemize}
+
+
+\subsection{Service Registry}
+\begin{itemize}
+    \item Leakage of feedback message
+          \begin{itemize}
+              \item Feedback messages send from service registry to the user is of authentication failed message. The user whoever encrypted the query must be a genuine user as he has to login to the client service portal to form a query. So, feedback message reveals no extra information to the genuine user.
+          \end{itemize}
+    \item \textcolor{blue}{Knows Query frequency of institution/user}
+\end{itemize}
+
+\subsection{Service Key Management System}
+\begin{itemize}
+    \item Leakage of feedback message
+          \begin{itemize}
+              \item Same as that of above
+          \end{itemize}
+    \item \textcolor{blue}{Knows Query frequency of institution/user}
+\end{itemize}
+
+\subsection{FHE Query Engine}
+\begin{itemize}
+    \item Leakage of feedback message
+          \begin{itemize}
+              \item Same as that of above
+          \end{itemize}
+    \item \textcolor{blue}{Knows Query frequency of institution/user}
+\end{itemize}
+
+\subsection{Encrypted Result Store}
+\begin{itemize}
+    \item \textcolor{blue}{Knows query frequency of institution/user}
+\end{itemize}
+
+
+
+

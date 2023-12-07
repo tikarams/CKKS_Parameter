@@ -1,0 +1,24 @@
+% !TeX root = ../sameplaper.tex
+% !TeX spellcheck = en_US
+
+\chapter{TEE Overhead}
+\setcounter{section}{0}
+
+\section{Trusted Execution Environment Overhead}
+Trusted execution environment (TEE) can be used for integrity protection. Attestation is used for integrity protection where the programs are executed in the server inside the enclave. However, the ciphertext are usually large in size and may result in performance bottleneck for computation as TEE are usually more restricted in terms of memory and available computational power then underlying untrusted computational environment. Recently in [1] this has been implemented and they presented some concrete numbers considering different circuits computed in the TEE. Here is the table taken from the paper \cite{viand2023verifiable} for the concrete numbers.
+
+
+\begin{table}
+    \begin{tabular}{|c|c|c|c | c|c|c | c|c|c| }
+        \hline
+        \multirow{2}{*}{Executed Program} & \multicolumn{3}{|c|}{Toy} & \multicolumn{3}{|c|}{Small} & \multicolumn{3}{|c|}{Medium}                                                              \\
+                                          & Setup                     & Prover                      & Verifier                     & Setup  & Prover  & Verifier & Setup   & Prover  & Verifier \\
+        \hline
+        FHE                               & .003 s                    & .002 s                      & .001 s                       & .807 s & .011 s  & .009 s   & 1.053 s & .014 s  & .010 s   \\
+        \hline
+        TEE                               & -                         & .154 s                      & -                            & -      & 1.100 s & -        & -       & 1.260 s & -        \\
+        \hline
+    \end{tabular}
+    \caption{Performance results for different instantiations of verifiable Fully Homomorphic Encryption. For FHE, Setup = Key Generation, Prover = Homomorphic Computation and Verifier = Encryption/ Decryption. Parameters used are N=8196 and log2 q= 137 = 45 +46+ 46. (1) Toy circuit computes a ciphertext-ciphertext multiplication on two inputs provided by the client. (2) Small circuit computes low-depth two party computation, computing x.v+w for an encrypted client input x and a private server input v and w. (3) Medium circuit computes  ModSwitch((x-w)2) for a client input x and server input w}
+    \label{tab1}
+\end{table}

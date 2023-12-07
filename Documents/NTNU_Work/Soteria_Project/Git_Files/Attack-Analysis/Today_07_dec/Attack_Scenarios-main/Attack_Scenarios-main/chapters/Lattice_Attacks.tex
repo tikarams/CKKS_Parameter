@@ -1,0 +1,1028 @@
+% !TeX root = ../sameplaper.tex
+% !TeX spellcheck = en_US
+
+\chapter{Lattice Attacks}
+\setcounter{section}{0}
+
+
+\section{Known attacks and their computational complexity}
+In this section, we will discuss possible attacks to break above mentioned hard problems and use them to suggest concrete parameters for practical applications.
+
+This section reviews the algorithms for solving the LWE, AGCD, and NTRU problems and tries to suggest concrete parameter choices based on different works available in the literature \cite{}. The hardness of these problems has been studied in terms of only asymptotic notations in much of the literature. Asymptotic notations usually give a good overview of the general behavior of an algorithm. However, simultaneously, it might result in weaker parameter settings as it may hide logarithmic and constant factors in the exponent. Therefore, it has to be taken care of when determining the secure parameters while designing a cryptosystem.
+
+While discussing the hardness of LWE and RLWE assumptions, we want to make sure that RLWE is instantiated with rings that are $2$-power or prime cyclotomic rings, and we do not currently know better attacks on RLWE than that of LWE problem \cite{}. The NTRU problem can also be considered as the homogeneous version of the RLWE problem. For the NTRU problem, a subfield attack has been proposed in the literature to break the homomorphic encryption schemes based on it \cite{albrecht2016subfield}. However, as of now, there is no indication that these attacks can be translated to the RLWE problem settings \cite{albrecht2017dual}. No known attack algorithms solve the RLWE problem faster than the LWE problem for the parameter choices typically considered in the fully homomorphic encryption settings. Thus, we discuss estimates and attacks for the LWE problem with some parameters used in FHE. However, we will also discuss some security-related issues varying the ring choice.
+
+Among the main proposed approaches for solving LWE instances includes the following
+\begin{enumerate}
+    \item Attack using Lattice algorithms
+    \item Attack using Algebraic algorithms
+    \item Attack using Combinatorial algorithms
+    \item Attack using Side-channel Information
+    \item Attack on Small LWE variant
+
+
+\end{enumerate}
+We will briefly discuss each of the above algorithms one by one, starting with the lattice algorithms.
+
+
+
+
+\subsection{Attack using Lattice algorithms}
+The lattice algorithm can be further categorized into three categories based on their approach to solving the LWE problem.
+\begin{enumerate}
+    \item Primal attack by solving Bounded Distance Decoding (BDD) problem
+    \item Primal attack by solving unique Shortest Vector (uSVP) Problem
+    \item Dual attack by solving Short Integer Solution (SIS) problem
+\end{enumerate}
+Here we consider all possible approaches for solving LWE, including the algorithms that may require many samples ($m$). We assume that the attacker has access to an unlimited number of samples. Thus we parameterize an LWE instance by $n,\alpha$, and $q$.
+
+However, in practical scenarios allowing an unlimited number of samples may not always be feasible since there are scenarios in which an attacker attempting to solve LWE would only have access to a limited number of samples. Hence it can be argued that allowing unlimited samples, and thus assuming the attacker is more powerful, may lead to overly conservative security estimates. This issue is addressed by Bindel et al. \cite{bindel2019estimation} by implementing an extension to the LWE estimator \cite{albrechtestimator} that enables the user to specify a limit on the number of samples, in addition to number of samples $m$ the usual parameters $n, \alpha$ and $q$, and then obtain an estimate of the hardness of the LWE instance in this case.
+
+Below we have presented each of the LWE-solving techniques briefly.
+
+
+
+\subsubsection{Primal attack by solving Bounded Distance Decoding (BDD)\label{Primal_BDD}}
+Lindner and Peikert present this attack \cite{lindner2011better} to use to solve the Search-LWE problem. LWE problem can be viewed as an average-case `bounded-distance decoding' problem on a certain family of lattices. Given an LWE problem with $(\textbf{A},\textbf{b})$, where $\textbf{A} \in \mathbb{Z}^{n\times m}_q$, the corresponding lattice can be defined as
+
+\begin{align*}
+    \Lambda(\textbf{A}^t) & = \{ \textbf{z} \in \mathbb{Z}^m : \exists \textbf{s} \in \mathbb{Z}^n_q \ \text{such  that } \textbf{z}=\textbf{A}^t\textbf{s}\ mod\ q \}
+\end{align*}
+
+Here the component $\textbf{b}=\textbf{As}+\textbf{e}$ of the LWE input may be seen as a perturbed lattice point in $\Lambda(\textbf{A}^t)$. Perturbed by a small error $\textbf{e}$ sampled from Gaussian distribution with mean zero and standard deviation $\sigma$. In this case, our solution to the BDD problem is the lattice point $\textbf{z}$. Given $(\textbf{A},\textbf{z})$, linear algebra can be used to recover the secret vector $\textbf{s}$ viz. to solve the search LWE problem.
+
+To recover the lattice vector $\textbf{z}$, a basis matrix $\textbf{B}$ is constructed, which is latter reduced using lattice reduction algorithms viz. LLL, BKZ, or its enhanced version BKZ2.0 with a  block size $\beta$. The reduced basis matrix is latter fed to the modified recursive Nearest Plane algorithm of Babai \cite{babai1986lovasz} along with the target vector $\textbf{b}$. The algorithm should output a lattice vector $\textbf{v} \in \mathcal{L}(\textbf{B})$, that is relatively close to the target vector $\textbf{t}$. The output lattice vector $\textbf{v}$, for the input target vector $\textbf{t}=\textbf{v}+\textbf{e}$ is correctly provided $\textbf{e}$  happens to lie in the fundamental parallelepiped of the Gram-Schmidt orthogonalization (GSO) of $\textbf{B}$ viz. in $\mathcal{P}_{1/2}(\tilde{\textbf{B}})$.
+
+Lindner and Peikert in \cite{lindner2011better} noted that in the reduced basis $\textbf{B}$, the fundamental parallelepiped is long and skinny, concurrently by the Geometric Series Assumption (GSA) due to Schnorr, the GSO of a BKZ-reduced basis decay geometrically making the probability that the Gaussian error vector $\textbf{e}$ falls in the corresponding fundamental parallelepiped very low. They addressed this issue by recursing the algorithm for $d_i \geq 1$ distinct planes at each recursion level. The affect of multiple recursion makes the parallelepiped $\textbf{P}_{1/2}(\tilde{\textbf{B}})$ wider by the same multiple $d_i$. This can be seen as a form of pruned CVP enumeration in the work of Liu et al. \cite{liu2013solving}. The increased success percent comes at the cost of increased runtime of the Nearest Planes algorithm, as it mainly depends on the number of points enumerated, which in this case, is the product of the scaling factors. However, the scaling factors alone don't determine the success probability; it also depends upon the quality of the reduced basis used. Thus to maximize the success probability, a proper scaling factor needs to be used, which is determined (predicted) based on the quality of the reduced basis used. There is no closed formula to predict the proper scaling factor; thus, the estimator uses a simple greedy algorithm to find it. However, this is not known to be optimal. Generally, the scaling factor and basis quality are decided based on the success percent required and the affordable runtime. More detail about the attack can be obtained in Lindner and Peikert \cite{lindner2011better}.
+
+
+
+\subsubsection{Primal attack by solving unique Shortest Vector Problem (uSVP)\label{Primal_uSVP}}
+Another primal attack to solve the LWE problem is to solve the unique shortest vector problem. Though in the literature, it has been shown that BDD and uSVP are polynomial-time equivalent for small approximation factors up to $\sqrt{n/\log{n}}$ \cite{lyubashevsky2009bounded}. However, the complexity study of the same has been recently performed by Albrecht et al. \cite{albrecht2014efficacy} presenting the technique for solving LWE problems using uSVP.
+
+Assuming the secret has a small norm, the LWE problem is initially converted into a BDD problem, as mentioned in section \ref{Primal_BDD}. Later the BDD problem is transformed into an instance of the uSVP problem using Kannan's \cite{kannan1987minkowski} embedding technique, as shown below.
+
+\begin{equation*}
+    \textbf{B}_1 =\begin{pmatrix}
+        \pmb{B}_0 & \hspace{1em} \pmb{b}' \\
+        0         & \hspace{1em}  t
+    \end{pmatrix} =
+    \begin{pmatrix}
+        \pmb{I}_n &  &  & \pmb{0}    & 0       \\
+        \pmb{A}   &  &  & q\pmb{I}_m & \pmb{b} \\
+        0         &  &  & 0          & t
+    \end{pmatrix}
+\end{equation*}
+where $\pmb{b}'=(\pmb{0}||\pmb{b})$, $||$ represents the concatenation operation. The lattice generated by the columns of $\pmb{B}_1$ contains the unique shortest vector, as shown below
+
+\begin{equation*}
+    \pmb{B}_1  \begin{pmatrix}
+        \hspace{1em} \pmb{s} \\
+        \hspace{1em} \pmb{c} \\
+        -1
+    \end{pmatrix} =
+    \begin{pmatrix}
+        \pmb{B}_0
+        \begin{pmatrix}
+            \pmb{s} \\
+            \pmb{c} \\
+        \end{pmatrix}+
+        \begin{pmatrix}
+            \hspace{1em} \pmb{0} \\
+            \pmb{-b}             \\
+        \end{pmatrix}
+        \\
+        -t
+    \end{pmatrix} =
+    \begin{pmatrix}
+        \hspace{1em} \pmb{s} \\
+        -\pmb{e}             \\
+        -t
+    \end{pmatrix}
+\end{equation*}
+
+
+This attack tries to directly find the secret vector $\textbf{s}$ from the given LWE samples $(\textbf{A},\textbf{b})$ using the Kannan's embedding technique \cite{kannan1987minkowski} with embedding factor $t$. % (in practice, usually $t=1$).
+Here the search version of the LWE problem is solved by finding a unique shortest vector generated by the following $q$-ary lattice.
+\begin{equation*}
+    \textbf{B} =\begin{pmatrix}
+        A^T & 0 \\
+        c^T & t
+    \end{pmatrix}
+\end{equation*}
+Since
+\begin{equation*}
+    (\textbf{s}|-1)\cdot \textbf{B}=(\textbf{e} | -t) \ mod\ q
+\end{equation*}
+
+The basis construction for the same can be performed by reducing matrix $\textbf{A}^T \in \mathbb{Z}_q^{n\times m}$, $(m>n)$ into row echelon form to obtain $[\textbf{I}_{n} | \textbf{A}']$ followed by appending $[\textbf{0}|q\textbf{I}_{m-n}]$ (to handle the modular reduction) and $[\textbf{c}^T|t]$, to obtain a $(m+1)$-dimensional $q$-array lattice as
+
+\begin{equation*}
+    \textbf{B} =\begin{pmatrix}
+        \textbf{I}_{n}     \ \  & \textbf{A}'                   \ \  & 0 \\
+        \textbf{0}         \ \  & q\textbf{I}_{m-n}             \ \  & 0 \\
+        \textbf{c}^T       \ \  & \ \                                & t \\
+    \end{pmatrix}
+\end{equation*}
+
+Here $t=dist(\textbf{c},\textbf{L(A)})$ is the embedding factor. Lyubashevsky and Micciancio \cite{lyubashevsky2009bounded} showed that if $t < \frac{\lambda_1{(L(A))}}{2\cdot \gamma}$, then $\textbf{L(B)}$ contains a $\gamma$-unique shortest vector as $c'=(e,-t)$. If we can recover this vector, the problem is solved.
+
+The problem can be solved by reducing it to $k$-\textit{Hermite Shortest Vector Problem} ($k$-HSVP). It has been shown by Lov\'{a}sz \cite{lovasz1986algorithmic} that any algorithm that can solve $k$-HSVP problem can be used linearly many times to solve approximate SVP with approximation factor $k^2$. A solution to $k^2$-approximate SVP would be a vector $v$ such that $||v||_2 \leq k^2\cdot \lambda_1(L)$. In a lattice with $k^2$-uSVP structure, any vector $w$ that is not the shortest vector and is independent of the shortest vector satisfies $||w||_2 \geq \lambda_2(L) > k^2\cdot \lambda_1(L)$. Thus we must have $\textbf{v}$, a multiple of the shortest vector; hence we have solved the problem we were trying to solve for $\gamma=k^2$. This bound has been improved by Ling et al. \cite{luzzi2013decoding} showing that, for a $N$ dimensional lattice, if $k>\sqrt{N}$ then any algorithm that can solve the $k$-HSVP can solve the $\gamma$-uSVP for $\gamma \approx \sqrt{N}_k$.
+
+When the secret vector $s$ is short, a second established embedding technique reduces the LWE problem to the uSVP problem \cite{bai2014lattice,albrecht2017revisiting}. It can be seen that the vector $(\nu \textbf{s}| \textbf{e}|1)$, for some $\nu \ne 0$, is contained in the following lattice
+\begin{equation*}
+    \Lambda= \Big\{\textbf{x} \in (\nu \mathbb{Z})^{n} \times \mathbb{Z}^{m+1}\ |\ \textbf{x}\cdot \Big(\frac{1}{\nu} \textbf{A}\ |\ \textbf{I}_m \ |\ -\textbf{c} \Big)^{T} \equiv 0 \ \text{mod} \ q \Big\}
+\end{equation*}
+Here, $\nu$ is the balancing factor that balances the size of the secret and the noise. The square basis matrix $\textbf{M}$ of $(n+m+1)$-dimension for the above lattice $\Lambda$ can be constructed as
+
+\begin{equation*}
+    \textbf{M} =\begin{pmatrix}
+        \nu \textbf{I}_n & -\textbf{A}^T & \textbf{0} \\
+        \textbf{0}       & q\textbf{I}_m & \textbf{0} \\
+        \textbf{0}       & \textbf{c}    & 1          \\
+    \end{pmatrix}
+\end{equation*}
+
+Here the basis matrix $\textbf{M}$ is full rank, det($\textbf{M}$)=Vol($\Lambda$) and the integer span of $\textbf{M} \subseteq \Lambda$, as
+
+\begin{equation*}
+    \begin{pmatrix}
+        \nu \textbf{I}_n & -\textbf{A}^T & \textbf{0} \\
+        \textbf{0}       & q\textbf{I}_m & \textbf{0} \\
+        \textbf{0}       & \textbf{c}    & 1          \\
+    \end{pmatrix}
+    \Big(\frac{1}{\nu} \textbf{A}\ |\ \textbf{I}_m \ |\ -\textbf{c} \Big)^{T} = \big( \textbf{A}-\textbf{A}\ |\ q\textbf{I}_m\ |\ \textbf{c}-\textbf{c}\big)^T \equiv \textbf{0} \ \text{mod} \ q
+\end{equation*}
+
+Note that $(\textbf{s}|*|1)\cdot \textbf{M}=(\nu\textbf{s}|\textbf{e}|1)$ for a suitable value of $*$. If the secret $\textbf{s}$ is small or sparse, as is used in homomorphic encryption libraries, choosing $\nu=1$ results in unbalanced vector $(\textbf{s}|\textbf{e}|1)$, i.e., $\frac{||s||}{\sqrt{n}} \ll \frac{||e||}{\sqrt{m}} \approx \sigma$, where $\sigma$ is the standard deviation of the LWE error distribution. Thus an appropriate value of $\nu$ is chosen to re-balance. Re-balancing not only preserves $(\textbf{s}|\textbf{e}|1)$ as the unique shortest vector in the lattice, it also increases the volume of the lattice being reduced; as a result, the reduced number of block size is required for the lattice reduction.
+
+For example, when the secret is sampled from the ternary distribution $||\nu\textbf{s}||^2 \approx \frac{2}{3}\nu^2n$. By choosing $\nu=\sqrt{\frac{3}{2}}\sigma$ it results to $||\nu\textbf{s}||\approx \sigma \sqrt{n}$ and $(\textbf{s}|\textbf{e}|1) \approx \sigma\cdot\sqrt{n+m}$. Similarly, if $w<n$, entries of $\textbf{s}$ are non-zero from $\{1,-1\}$, we get $||\nu\textbf{s}||^2 =w \nu^2$, thus by setting $\nu=\sigma\sqrt{\frac{n}{w}}$ we obtain a vector $\nu\textbf{s}=\sigma\sqrt{n}$.
+
+
+\subsubsection{Dual attack by solving Short Integer Solution (SIS)}
+\label{Text:Deal_attack}
+The dual strategy solves the Decisional-LWE problem by solving the Shortest Integer Solution (SIS) problem. Here the goal is to distinguish the LWE sample from randomly sampled samples. This is done by finding a short vector $\textbf{v}$ in the following dual lattice generated by $\textbf{A}$.
+\begin{equation*}
+    \Lambda(\textbf{A}^t)=\{\textbf{w} \in \mathbb{Z}_q^m\ | \ \textbf{wA} \equiv 0 \ \text{mod}\ q\}
+\end{equation*}
+Finding a short vector from the above lattice is equivalent to solving the Short Integer Solution problem. Equivalently, the points of $\Lambda(\textbf{A}^t)$ may be partitioned into hyperplanes orthogonal to $\textbf{v}$, successively separated by distance $\frac{q}{||\textbf{v}||}$.
+
+Vector $\textbf{v}$ computed above helps us to distinguish LWE samples from the uniform samples as the inner product of
+\begin{equation*}
+    <\textbf{v},\textbf{b}>\ = <\textbf{v},\textbf{As}+\textbf{e}>\ = <\textbf{v},\textbf{As}> +<\textbf{v},\textbf{e}>\ \equiv_q <\textbf{v},\textbf{e}>
+\end{equation*}
+This approximately follows a Gaussian distribution over $\mathbb{Z}$ modulo $q$, assuming not too many of the components of $\textbf{v}$ are too large. In general $<\textbf{v},\textbf{b}>$ is uniform if $\textbf{b}$ is uniform over $\mathbb{Z}_q$, but when it is LWE sample it result into $<\textbf{v},\textbf{e}>$, which is small as both $\textbf{v}$ and $\textbf{e}$ are small. The advantage $\epsilon$ of distinguishing an LWE sample from that of the uniformly random sample can be given from the following result.
+\begin{lemma} \cite{lindner2011better}
+    The advantage of distinguishing a LWE sample parameterized by $n,\alpha$ and $q$ from that of random sample can be given as $\text{exp}(-\pi\cdot(||\textbf{v}||\cdot \alpha)^2)$, where $||\textbf{v}||$ is the length of the vector $\textbf{v}$ computed in the dual lattice $\Lambda(\textbf{A}^t)=\{\textbf{w} \in \mathbb{Z}_q^m\ | \ \textbf{wA} \equiv 0 \ \text{mod}\ q\}$ and $\alpha$ is the error rate.
+\end{lemma}
+
+For example, when the length of the vector $||\textbf{v}||=\frac{4}{\alpha}$, the distinguishing advantage is about $2^{-72}$. However, to distinguish with better advantage, one needs to have $||\textbf{v}|| \leq \frac{1}{2\cdot\alpha}$ or so, but this requires more effort. Also, it is clear from above that for an advantage $\epsilon$, the length of the vector $\textbf{v}$ needs to be  $||\textbf{v}||=\frac{1}{\alpha} \cdot \sqrt{\frac{ln(\frac{1}{\epsilon})}{\pi}}$.
+
+There is a direct relationship between success probability and time to obtain the short vectors. Usually, depending upon the algorithm used to obtain vector $\textbf{v}$, it might be advantageous to accept longer vectors than short vectors. Accepting long vectors may result in a decreased distinguishing advantage, but this can be compensated using the Chernoff bound \cite{chernoff1952measure} i.e., running the algorithm about $\frac{1}{\epsilon^2}$ times, which results in success probability nearly close to $1$. In fact, this might be the faster alternative than running the algorithm to obtain short vectors, which requires more time to get those vectors and, thus, more running time.
+
+In literature, it has been claimed that dual attacks are rarely better than primal ones \cite{albrecht2018estimate}.
+
+
+
+
+
+\subsection{Attack using Algebraic algorithms: Arora-Ge algorithm}
+In \cite{arora2011new}, Arora-Ge proposed the first algebraic algorithms to solve the LWE problem. The technique reduces the LWE problem to find the common root of a multivariate system of high-degree, error-free polynomials. The technique can solve the LWE problem in $2^{\tilde{O}(n^{2\epsilon})}$ operations, making it sub-exponential when $\epsilon<\frac{1}{2}$.
+
+Given LWE sample $(\textbf{a}, \textbf{c}) \in \mathbb{Z}^{n+1}_q \times \mathbb{Z}_q$, write $f = c - \sum_{i=1}^{n} a_i\cdot x_i$, with $x_i$ representing the variables. Assuming that the error $\textbf{e}$ falls in the interval $\{-T, \cdots , T\}$, then the polynomial $F =f \cdot \Pi_{i=1}^T(f + i) \cdot (f - i)$ of degree $2T + 1$ evaluates to zero when $\textbf{x} = \textbf{s}$. If $T < \lfloor \frac{q}{2} \rfloor$, then $F = 0$ is a constraint on the possible values for the secret vector $\textbf{s}$. Thus collecting many such equations and solving the resulting multivariate high-degree system of equations recovers the secret key $\textbf{s}$. Arora-Ge used the linearisation method to solve these systems of equations. The number of samples needed for this technique to work is $\textbf{O}(n^{2T+1})$. Considering more samples increases the probability of noise falling outside the chosen interval of $\{-T, \cdots, T\}$, invalidating the constraint $F=0$. Thus, as the number of samples grows, it is required to have more value for $T$ so that the polynomials system remains error-free. This results in a further increase in number of samples. Arora-Ge has thoroughly analyzed and studied the trade-off to solve the LWE problem in \cite{arora2011new}. Albrecht et al. \cite{albrecht2014algebraic} performed a further study of the Arora-Ge algorithm and mentioned the following complexity result.
+
+\begin{theorem}
+    \cite{albrecht2014algebraic}
+    Given LWE sample with parameters $n,q,\sigma=\alpha q/ \sqrt{2\pi}$, $2\leq \omega <3$ be the linear algebra constant and $D_{AG}=8\sigma^2\log{n}+1$.
+    If $D_{AG}\in o(n)$ then Arora-Ge algorithm solves the computational LWE problem in time
+    \begin{equation*}
+        O\Big(2^{\omega\cdot D_{AG}\log{\frac{n}{D_{AG}}}}\cdot \sigma q \log{q} \Big) =O\Big(2^{8\omega\sigma^2\log{n}(\log{n}-\log{(8\sigma^2\log{n})})}\Big)
+    \end{equation*}
+    and memory
+    \begin{equation*}
+        O\Big(2^{2\cdot D_{AG}\log{\frac{n}{D_{AG}}}}\cdot \sigma q \log{q} \Big) =O\Big(2^{16\sigma^2\log{n}(\log{n}-\log{(8\sigma^2\log{n})})}\Big)
+    \end{equation*}
+    If $n\in o(D_{AG})$ then Arora-Ge algorithm solves the computational LWE problem in time
+    \begin{equation*}
+        O\Big(2^{\omega n \log{\frac{D_{AG}}{n}}}\cdot \sigma q \log{q} \Big) =O\Big(2^{\omega n\log{(8\sigma^2\log{n})}-\omega n \log{n}}\Big)
+    \end{equation*}
+    and memory
+    \begin{equation*}
+        O\Big(2^{2n \log{\frac{D_{AG}}{n}}\cdot \sigma q \log{q}} \Big) =O\Big(2^{2n\log{(8\sigma^2\log{n})}-2n\log{n}}\Big)
+    \end{equation*}
+\end{theorem}
+
+Albrecht in \cite{albrecht2014algebraic} further showed that using Gr\"{o}bner basis Arora-Ge algorithm can be improved. Arora-Ge used the linearisation method to solve LWE using $O(n^d)$ LWE samples. This can be reduced using Gr\"{o}bner basis but at the cost of a more expensive solving step. However, this approach requires an assumption that random systems behave like semi-regular sequences; justification of the same can be obtained in \cite{albrecht2014algebraic}. In particular, when $\alpha q=\sqrt{n}$, following result is obtained
+
+\begin{theorem}
+    For a given LWE sample $(\textbf{a}_i, \textbf{c}_i) \in \mathbb{Z}^{n+1}_q \times \mathbb{Z}_q$ for $i\geq1$, $\alpha q =\sqrt{n}$ and $\omega$, a linear algebra constant. There is a heuristic algorithm to recover the secret in time complexity $O(2^{2.35\omega n+1.13n})$, memory complexity $O(2^{5.85n})$ and sample complexity $m=exp(\frac{\pi}{4}\cdot n)$
+\end{theorem}
+
+
+
+\subsection{Attack using Combinatorial algorithms: BKW algorithm}
+BKW algorithm, named using the first letters of its inventors Blum-Kalai-Wasserman \cite{blum2003noise}, was initially proposed to solve the Learning Parity with Noise (LPN) problem. It is a combinatorial algorithm to solve the LPN problem; however, it can also be easily adapted to solve the LWE problem. Recently, further investigation of the algorithm has been performed by Albrecht et al. in \cite{albrecht2014algebraic} and suggested some complexity measures, as presented in the later part of the section.
+
+The algorithm works in two phases, the reduction phase and the solving phase. In the reduction phase, a series of operations are performed, known as BKW steps. These steps iteratively reduce the dimension of the problem, however, at the cost of increasing noise level. At the end of the reduction phase, we get a transformed problem with a much smaller dimension but higher noise. The transformed new problem is later solved efficiently by distinguishing in the solving phase.
+
+BKW algorithm is parameterized by $a$ and positional value, say $b=\frac{n}{a}$, in the LWE sample vectors. Two samples are included in the same category if and only if $b$ positional values get canceled when added or subtracted. For example, assuming we have two samples $\textbf{a}_1$ and $\textbf{a}_2$ within the same category. Now, adding/subtracting these two sample results into
+\begin{equation*}
+    \textbf{a}_{12}=[\underbrace{0,0, \cdots 0}_\text{b variables},*, *,\cdots, *]
+\end{equation*}
+The resulting final sample we get after addition/subtraction is the sample $\textbf{a}_{12}$. The noise of the variable increases up to $e_{12}=e_{2}+e_{2}$, with variances $2\sigma^2$, where $\sigma^2$ is the variance of the original noise. Thus, by performing the above step in each category, we have successfully reduced the number of variables by $b$  but at the cost of increasing noise variance by $2\sigma^2$. Repeating the above step for a say $t$ number of times, we can successfully reduce the number of variables or the problem's dimensionality by $(n-tb)$ with the cost of increasing noise variance by $2^t\cdot \sigma^2$. The following results have been observed by Albrecht et al. in \cite{albrecht2014algebraic}.
+
+\begin{theorem} \cite{albrecht2014algebraic,c54b603f579b48a08b698bde47b71455}
+    Let $(\textbf{a}_i , c_i)$ be a LWE sample or a uniform distribution on $\mathbb{Z}_q^n \times \mathbb{Z}_q$ , $0 < b \leq n$ and $a =\lceil\frac{n}{b}\rceil$, say $0<\epsilon<1$ be the targeted success rate. Then the expected cost of the BKW algorithm to distinguish LWE sample from a random sample with success probability $\epsilon$ is
+    \begin{equation*}
+        \Big(\frac{q^b-1}{2}\Big) \cdot \Big(\frac{a(a-1)}{2}\cdot(n+1)-\frac{ba(a-1)}{4}-\frac{b}{6} \Big((a-1)^3+\frac{3}{2}(a-1)^2+\frac{1}{2}(a-1)\Big)\Big)
+    \end{equation*}
+    addition/subtraction are performed in $\mathbb{Z}_q$ to obtain the elimination tables,
+    \begin{equation*}
+        \frac{1}{exp(-\pi\alpha^2 2^{a})^2} \cdot\Big(\frac{a}{2}\cdot(n+2)\Big)
+    \end{equation*}
+    addition/subtraction are performed in $\mathbb{Z}_q$ to obtain new samples. Furthermore,
+    \begin{equation*}
+        a\cdot \Big\lceil \frac{q^b}{2} \Big\rceil + \frac{1}{exp(-\pi \alpha^2 2^a)^2}
+    \end{equation*}
+    calls are performed to the LWE sampler and storage for
+    \begin{equation*}
+        \Big( \frac{q^b}{2} \cdot a \cdot \Big( n+1-b\cdot \frac{a-1}{2} \Big)
+    \end{equation*}
+    elements in $\mathbb{Z}_q$ are needed
+\end{theorem}
+
+
+
+
+\begin{theorem} \cite{albrecht2014algebraic,c54b603f579b48a08b698bde47b71455}
+    Given LWE samples $(\textbf{a}_i,c_i)$ from LWE sampler and setting $a=\lfloor \log_2{(1/(2\alpha)^2} \rceil$, $b=\frac{n}{a}$, and $q$, a prime number. Let $d$ be a small constant $0<d<\log_2{(n)}$. Assuming $\alpha$ as such that $q^b=q^{n/a}=q^{n/\lfloor \log_2(1/(2\alpha)^2) \rceil}$ is superpolynomial in $n$. Provided the above parameters, the cost of solving the BKW algorithm to solve Search-LWE is
+    \begin{equation*}
+        \Big(\frac{q^b-1}{2}\Big) \cdot \Big(\frac{a(a-1)}{2}\cdot(n+1)\Big) + \Big\lceil \frac{q^b}{2} \Big \rceil \cdot \Big(\Big\lceil \frac{n}{d} \Big\rceil +1 \Big)\cdot d \cdot a + poly(n) \approx (a^2n)\cdot \frac{q^b}{2}
+    \end{equation*}
+    operations in $\mathbb{Z}_q$. Furthermore,
+    \begin{equation*}
+        a\cdot \Big\lceil\frac{q^b}{2} \Big\rceil +poly(n)
+    \end{equation*}
+    calls to the LWE sampler and storage of
+    \begin{equation*}
+        \Big( a \cdot \Big \lceil \frac{q^b}{2} \Big \rceil \cdot n \Big)
+    \end{equation*}
+    $\mathbb{Z}_q$ elements are needed
+\end{theorem}
+
+Many improvements to the plain BKW steps have been proposed in the literature, viz. lazy modulus switching by Albrecht et al. in \cite{albrecht2014lazy}, which is further developed by Kirchner et al. in \cite{kirchner2015improved}. In \cite{guo2015coded}, Guo et al. introduced Coded-BKW, the idea is to map the vectors to the lattice codeword that is nearest in Euclidean norm, such that the vectors that are mapped to the same Codeword get canceled. Using coded-BKW, noise introduced in the process can be controlled so that it is not more than the noise that would have been introduced with a standard BKW procedure. Later, BKW with sieving is introduced by Guo et al. in \cite{guo2017coded} and is improved in \cite{guo2019asymptotics,maartensson2019asymptotic}.
+
+It has been observed by Albrecht et al. in \cite{albrecht2017dual} that the BKW-type algorithm can be seen as a general framework where firstly, a smaller dimensional LWE instance is created using iteration of some quantization technique, then the obtained smaller dimensional instance is solved using any preferred method.
+
+
+Attack using Side-channel Information
+
+
+
+
+\subsection{Attack using Side Information}
+Based on how a computer protocol or algorithm is implemented, it can leak some information to the environment. These pieces of information are not because of the flaws in the protocol design or algorithm itself but potentially devastating mistakes or oversights in the implementation. A few sources of side-channel leakage include cold boot, timing information, power consumption, electromagnetic leaks, flush gauss and reload of cache, differential fault, existential forgery, practical fault, sound information, etc., which could be exploited to facilitate the side-channel attacks. However, when these pieces of information are used standalone to construct the secret information, new techniques, and algorithms are required to be developed for each of these settings. Moreover, when these techniques are used ad-hoc, we need to find a way to take advantage of decades worth of research and help optimize the standard lattice attacks. Moreover, most of the side-channel attacks from prior work consider substantial amounts of information leakage and show that it leads to feasible recovery of the entire key. In contrast, it might be interesting if more precise trade-offs in terms of information leakage versus the concrete security of the scheme could be obtained.
+
+To answer these questions, Dana et al. in \cite{dachman2020lwe} created a toolkit to integrate side channel information in the form of ``hints", about the secret and/or error, into the uSVP instance, which is later solved using a lattice-reduction algorithm. They have observed that integrating side-channel information into the lattice reduction attacks results in a less secure scheme. Their attack technique generalizes the so-called primal lattice reduction attack and allows the progressive integration of hints before running a final lattice reduction step. In short, integrating hints include sparsifying the lattice, projecting onto and intersecting with hyperplanes, and/or altering the distribution of the secret vector.
+
+Their technique primarily generalizes the Bounded Distance Decoding problem (BDD) to a Distorted version (DBDD). An instance of DBDD consists of three parts: lattice $\pmb{\Lambda}$, mean vector $\pmb{\mu}$, and covariance matrix $\pmb{\Sigma}$. Here the lattice $\pmb{\Lambda}$ represents the lattice obtained by Kannan's embedding- a way to construct a lattice where the LWE secret/error is the shortest non-zero vector. The side information can be used to sparsify or reduce the dimension of the original lattice. The remaining part, viz. $(\pmb{\mu,\Sigma})$ corresponds to the mean vector and covariance matrix, representing the distributional information about the LWE secret/error. Here $(\pmb{\mu,\Sigma})$ represents that the secret/error is drawn from a distribution with known mean/covariance determined by the specifications of the cryptosystem. Subsequently, given the side information, it captures the conditional distribution on the secret/error in cases where it remains well approximated by a Gaussian. Thus, certain types of information on the structure or on the distribution of the secret can be integrated into a DBDD instance, starting with the original instance and then modifying $\pmb{\Lambda}$, and/or $(\pmb{\mu, \Sigma})$ appropriately.
+
+A DBDD instance is later converted into a uSVP instance by performing two steps, viz. first homogenization—centering the ellipsoid at the origin and second isotropization—applying a linear transformation that simultaneously transforms the ellipsoid into a ball and transforms the lattice into a different lattice with higher volume. Finally, the resulting uSVP instance is fed into the lattice reduction algorithm to obtain the shortest non-zero vector in the transformed lattice. The recovered short non-zero vector is later used to retrieve the LWE secret/error. The major steps mentioned above can be pictorially presented in figure \ref{fig:Lwe_with_side_information}.
+
+
+% (refer defination \ref{def:DBDD}), which allows to account for the potentially non-spherical covariance of the secret vector that needs to be found.
+
+% \begin{definition} \cite{dachman2020lwe}
+%     (Distorted Bounded Distance Decoding problem) Let $\bold{\Lambda} \subset \mathbb{R}^d$ and $\bold{\Sigma} \in \mathbb{R}^{d\times d}$ represents the lattice and symmetric matrix respectively and $\pmb{\mu} \in Span(\bold{\Lambda}) \subset \mathbb{R}^d$ such that
+%     \begin{equation*}
+%          Span(\bold{\Sigma}) \subsetneq Span(\bold{\Sigma} + \pmb{\mu}^T \cdot \pmb{\mu}) = Span(\bold{\Lambda})
+%     \end{equation*}
+%     The Distorted Bounded Distance Decoding problem DBDD$_{\pmb{\Lambda,\mu,\Sigma}}$ can be defined as follows:
+
+% \textbf{Given} $\pmb{\mu}, \pmb{\Sigma}$ and a basis of $\bold{\Lambda}$.
+
+% \textbf{Find} the unique vector $\bold{x} \in \bold{\Lambda}  \cap E(\pmb{\mu}, \bold{\Sigma})$
+
+% where $E(\pmb{\mu},\bold{\Sigma})$ denotes an ellipsoid as represented below
+% \begin{equation*}
+%     E(\pmb{\mu}, \bold{\Sigma}) = \{ \bold{x} \in \pmb{\mu} + Span(\bold{\Sigma})|(\bold{x} - \pmb{\mu}) \cdot \bold{\Sigma}^{\sim} \cdot (\bold{x} - \pmb{\mu})^T \leq  rank(\bold{\Sigma}) \}.
+% \end{equation*}
+% A instance of DBDD$_{\pmb{\Lambda,\mu,\Sigma}}$ is represented by the triple $\bold{I} = (\pmb{\Lambda, \mu, \Sigma})$.
+% \label{def:DBDD}
+% \end{definition}
+
+%Integrating each hint affects the lattice itself, the mean and the covariance parameter of the DBDD instance, as a result problem becomes comparatively easier. After integrating all hints the distribution is made spherical again by applying a well-chosen linear transformation, reverting back to the spherical BDD instance before running the attack. Inclusion of hints make the problem instance easier than the original problem instance and can be done in polynomial time. The whole approach of \cite{dachman2020lwe} is pictorially presented by the figure \ref{fig:Lwe_with_side_information}.
+% \vspace{-1em}
+\begin{figure}[!ht]
+    \centering
+    \begin{tikzpicture}
+
+        \node at (-12,0) {$\text{LWE/BDD}$};
+
+        \draw [->](-12,-0.3) -- (-12,-1);
+        \node at (-11.5,-1.3) {$\text{DBDD}_{\Lambda_0,\Sigma_0,\mu_0}$};
+
+        \draw [->](-10.4,-1.3) -- (-9.4,-1.3);
+        \node at (-8.2,-1.3) {$\text{DBDD}_{\Lambda_1,\Sigma_1,\mu_1}$};
+
+        \draw [->](-7.1,-1.3) -- (-6.1,-1.3);
+        \node at (-5.3,-1.3) {$\cdots\cdots$};
+
+        \draw [->](-4.7,-1.3) -- (-3.7,-1.3);
+        \node at (-2.5,-1.3) {$\text{DBDD}_{\Lambda_h,\Sigma_h,\mu_h}$};
+
+        \draw [->](-2.5,-1.5) -- (-2.5,-2.2);
+        \node at (-2.5,-2.5) {$\text{uSVP}_{\Lambda'}$};
+
+        \draw [->](-2.5,-2.8) -- (-2.5,-3.5);
+        \node at (-2.5,-3.8) {$\text{Lattice Reduction}_{\Lambda'}$};
+    \end{tikzpicture}
+    \caption{Attack technique used in \cite{dachman2020lwe}}
+    \label{fig:Lwe_with_side_information}
+\end{figure}
+
+
+
+In \cite{dachman2020lwe}, integration of four types of hints usually obtained from side-channel information, on the secret vector $\textbf{s}$, or on the lattice $\pmb{\Lambda}$ have been considered. We briefly mention these here; for more information, please refer to \cite{dachman2020lwe}.
+\begin{enumerate}
+    \item Perfect hints: A perfect hint is the knowledge of a hyperplane intersecting the lattice. For a secret vector $\pmb{s}$, if we know the a vector $\pmb{v} \in \mathbb{Z}^{d-1}$ and $l \in \mathbb{Z}$ on the secret $\pmb{s}$, then it satisfies the equality
+          \begin{equation*}
+              <\textbf{s},\textbf{v}> \quad = l
+          \end{equation*}
+          The introduction of a perfect hint decreases the lattice's dimension by one and increases its volume.
+
+    \item Modular hints: A modular hint helps to sparsify the lattice. For a secret vector $\pmb{s}$, if we know $\pmb{v} \in \mathbb{Z}^{d-1}; k \in \mathbb{Z}$ and $l \in \mathbb{Z}$, such that $<\textbf{s},\textbf{v}> = l$ mod $k$ then it can also be written as
+          \begin{equation*}
+              <\bar{\pmb{s}},\bar{\pmb{v}}> \quad = 0 \quad \text{mod}\quad k
+          \end{equation*}
+          where $\bar{\pmb{s}}=(\pmb{s},1)$ is the extended secret, and $\bar{\pmb{v}}:=(\pmb{v},-l)$.
+
+    \item Approximate hint: A approximate hint decreases the covariance of the secret. For a secret vector $\pmb{s}$, if we know $\pmb{v} \in \mathbb{Z}^{d-1}$ and $l \in \mathbb{Z}$, such that
+          \begin{equation*}
+              <\pmb{s},\pmb{v}> +\ e = l
+          \end{equation*}
+          here $e$ models the noise following distribution $N(0,\sigma_e^2)$, independent of $\pmb{s}$.
+          % Approximate hint can arise from following scenarios:
+          % \begin{itemize}
+          % \item any noisy side channel information about a secret coefficient.
+          % \item decryption failures.
+          % \end{itemize}
+          % The knowledge gained from above leakages are combined with the prior knowledge on the solution $\pmb{s}$ to include it in the DBDD instance.
+
+
+    \item Short vector hint: A short vector hint is the one that generalizes the standard trick consisting of ignoring certain LWE equations; ignoring such equations can also be geometrically interpreted as an orthogonal projection to a so-called $q$-vector. In short, a short vector hint on the lattice $\pmb{\Lambda}$ is the knowledge of of a short vector $\bar{\pmb{v}}$ such that
+          \begin{equation*}
+              \bar{\pmb{v}}\in \Lambda
+          \end{equation*}
+          Short vector hints are not related to the secret and are not expected to be obtained by side-channel information but rather by the very design of the scheme itself. It is to be noted that, among all hints, the short vector hints are the ones that are integrated at last.
+\end{enumerate}
+
+
+
+In \cite{cryptoeprint:2022/1345}, an alternative approach based on geometric interpretation has been provided to integrate hints. The solution of the LWE problem instance is viewed as a unique integer point contained in an ellipsoid constructed from the given LWE instance. Such an instance can be specified by the lattice $\pmb{\Lambda} = \pmb{I}_{d\times d}$, with center $\pmb{\mu}$ and the positive semidefinite ``shape" matrix $\pmb{\Sigma}$ defining the ellipsoid. Here, the initial embedding obtained is different than the dimension of the DBDD instance and is called an Ellipsoidal Bounded Distance Decoding (EBDD) problem. Like the DBDD, an EBDD instance is converted into an SVP instance by first converting it to a DBDD instance (by embedding it in the space of one higher dimension) and then using homogenization and isotropization.
+
+The approach used in \cite{cryptoeprint:2022/1345} differs from the earlier approach based on how they view the ``hints". Here the hints are viewed as a geometric operation on the EBDD, while in \cite{dachman2020lwe}, hints are viewed as a conditional probability distribution represented by a mean and covariance on the secret/error, which means hints corresponding to information $Z = z$ such that the distribution $N(\pmb{\mu, \Sigma}) | Z = z$ is (well approximated by) a Gaussian (as was the case for perfect and conditional approximate hints, for example), could be integrated into a DBDD instance. EBDD instance, however, only requires maintaining the invariant that the lattice point corresponding to the correct solution is contained inside the ellipsoid that is a part of the instance. As a result, flexibility to integrate hints for which $N(\pmb{\mu}, \pmb{\Sigma}) | Z = z$ is not (well approximated by) a Gaussian can be achieved. Using the EBDD problem, two new kinds of hits can be integrated, as mentioned below.
+
+\begin{enumerate}
+    \item Inequality hints: It corresponds to the intersection region of an ellipsoid and a halfspace. Inequality hint of type can be represented as
+          \begin{equation*}
+              <\pmb{v},\pmb{s} \geq \gamma
+          \end{equation*}
+          where $\pmb{v}$ is known and $\pmb{s}$ is the LWE secret/error vector.
+
+          As this is no longer well approximated by a Gaussian distribution, the prior approach could not directly handle these hints. However, in the geometric perspective, this hint corresponds to information that the LWE secret is contained in the intersection of the initial ellipsoid and the halfspace $\{ \pmb{x} \in \mathbb{R}^d | < \pmb{x, v} > \geq \gamma \}$, resulting in an easier uSVP.
+
+          Inequality hints are helpful in modeling decryption failure setting since the information that is learned from a decryption failure is precisely of this form.
+
+    \item Combined hints: It corresponds to the intersection region of two ellipsoids. Here, the hints obtained from two DBDD or EBDD instance $(\pmb{\Lambda,\mu_1,\Sigma_1})$ and $(\pmb{\Lambda,\mu_2,\Sigma_2})$ is ``fuse" into a single instance, using an approach known as fusion approach- a way to find the convex combination of the two ellipsoids that optimizes the volume of the resulting ellipsoid \cite{ros2002ellipsoidal,wang2019equivalence}.
+
+          This type of hint can be used to fuse information from a decryption failure and a side-channel attack. Combined hints reduce the hardness of the resulting uSVP instance, compared to a naive combination of the information, resulting in a small $\beta$ value required to recover the secret.
+\end{enumerate}
+
+Finally, they have provided experimental data by integrating hints to the LWE problem to estimate LWE's hardness using a toolkit publicly available in \cite{HunterKippenToolkit}.
+
+
+
+
+
+
+\section{Attack on Small LWE variant}
+
+In HE, small variants of the LWE problem are used to boost efficiency. The primary reason behind this is that the secret vector's norm deeply affects HE's performance. Most HE implementations use small (primarily ternary) secret vectors \cite{halevi2013design,laine2016simple,Kim18}. Moreover, to support fully homomorphic encryptions, one needs to perform a bootstrapping technique. The performance of bootstrapping depends on the Hamming weight of the secret vector; thus, HE implementations further use sparse ternary secret vectors in practice \cite{halevi2021bootstrapping,chen2018homomorphic,cheon2018bootstrapping}. Therefore, investigating small variant LWE problems is crucial in securing HE schemes.
+
+
+In this section, we will cover different techniques available to solve variants of LWE with unusually small secrets. In the small secret LWE problem, secrets/errors can be sampled from three types of distributions, viz.
+\begin{enumerate}
+    \item Binary
+    \item Ternary
+    \item Gaussian
+\end{enumerate}
+
+
+
+
+
+
+\subsection{Direct secret key recovery}
+In this technique, the secret key is recovered directly by searching for a suitable secret $\textbf{s}'$ such that
+\begin{equation*}
+    ||\textbf{As}'-\textbf{c}||_2
+\end{equation*}
+is small. Direct secret key recovery and BDD are very similar but differ only based on $\textbf{e}$ or $\textbf{s}$ they target.
+
+In direct key recovery, exhaustive search can be used to find the secret key; however, the complexity of this technique is very high. The following result can give it.
+
+\begin{theorem} \cite{c54b603f579b48a08b698bde47b71455}
+    Given an LWE sample parameterized by $n,\alpha$ and $q$. The time complexity of solving Search-LWE with success probability $\epsilon$ using exhaustive search is
+    \begin{equation*}
+        m \cdot (2t\alpha q +1)^n \cdot 2n = 2^{n\log{(2t\alpha q +1)+ \log{n} + 1 + \log{m}}}
+    \end{equation*}
+    operations in $\mathbb{Z}_q$. The memory complexity is $n$, and the number of samples required is $n+m$ with
+    \begin{equation*}
+        m=\frac{\log{(1-\epsilon)}-n\log{(2t\alpha q+1)}}{\log{(2t\alpha)}}
+    \end{equation*}
+    for some small parameter $t=\omega(\sqrt{\log{n}})$
+\end{theorem}
+
+
+
+
+\subsection{Lattice decoding attack on binary LWE:}
+\label{sec:Galbraith_decoding}
+The binary LWE problem introduced by Brakerski, Langlois, Peikert, Regev, and Stehl\'e \cite{brakerski2013classical} and Micciancio and Peikert \cite{micciancio2013hardness} is expected to be easier than that of the standard LWE problem (secret comes from Gaussian distribution) but the lattice dimension suggested was way too large ($n\log{n}$) than normal LWE ($n$). Thus there was a need for concretizing dimension for binary LWE problem to get the same level of security as that of standard LWE problem, which is addressed, analyzed, and also suggested parameters to get the same level of protection as that of standard LWE problem by Bai and Galbraith in \cite{bai2014lattice}.
+
+In \cite{bai2014lattice}, Bai and Galbraith used a lattice decoding attack on the binary-LWE problem. The idea is to convert the binary-LWE problem into the inhomogeneous short integer solution (ISIS) problem, then solve the closest vector problem in the rescaled lattice. The concept of rescale is used to make the standard lattice attacks more effective. They also tried to use the modulus switching technique to increase the attack efficiency but discovered that it was not at all helpful. In brief, the attack goes as follows.
+
+Given a LWE problem instance $(\pmb{A},\pmb{b})$, in the first step, it is converted to an ISIS problem instance. In the second step, ISIS is converted to the CVP problem instance, which is solved to obtain the final solution. Formally the LWE instance is converted to an ISIS problem instance as
+\begin{equation*}
+    \pmb{b} \equiv (\pmb{A}|\pmb{I}_m) (\frac{\pmb{s}}{\pmb{e}}) \hspace{2em} (mod\ q)
+\end{equation*}
+
+In the second step above ISIS instance is converted into the CVP problem instance. Which is done by defining a vector $\pmb{w}=(0,\pmb{b}^T)^T$, such that $(\pmb{A}|\pmb{I}_m)\pmb{w} \equiv \pmb{b}$ (mod $q$). Then a basis matrix $\pmb{B}$ is constructed for the lattice
+$\mathcal{L}'=\{\pmb{v} \in \mathbb{Z}^{m+n}: (\pmb{A}|\pmb{I}_m)\pmb{v} \equiv 0 \} \ (mod\ q)\}$. This is done by initially constructing a matrix $\pmb{M}^{(n+m)\times(m+2n)}$ as follows:
+\begin{equation*}
+    \pmb{M}=
+    \begin{bmatrix}[c|c]
+        \pmb{I}_n &                \\
+                  & q\pmb{I}_{n+m} \\
+        -\pmb{A}  &                \\
+    \end{bmatrix}
+\end{equation*}
+
+Matrix $\pmb{M}$ above span the space of all vectors $\pmb{v}$ such that $(\pmb{A}|\pmb{I}_m)\pmb{v} \equiv 0 \ (mod\ q)$. Computing the column Hermite normal form of $\pmb{M}$ gives an $(m+n)\times (m+n)$ matrix $\pmb{B}$ whose columns generate the lattice $\mathcal{L}'$. It is to be noted that the $det(\pmb{B}) = q^m$.
+
+In the above lattice a vector $\pmb{v} \in \mathbb{Z}^{m+n}$ is needed satisfying $\pmb{Bv} \equiv 0\ (mod\ q)$ and $\pmb{v} \equiv \pmb{w}$. Hope is that $\pmb{w} - \pmb{v} = (\frac{\pmb{s}}{\pmb{e}})$ and so $\pmb{v} = (\frac{\pmb{s}}{*})$, where $*$ is actually going to be $\pmb{b}-\pmb{e}$.
+
+Here the CVP algorithm is trying to find an unbalanced solution as $||\pmb{s}||<<||\pmb{e}||$. Thus there is a need to rebalance things that are done by multiplying the first $n$ rows of $\pmb{B}$ by $\sigma$ (or some other appropriate scaling factor). The advantage of doing this is that this increases the volume of the Lattice without significantly increasing the norm of the error vector in the CVP instance. As a result, the Hermite factor of the problem is increased, and hence the range of the lattice attack for a given security level is increased. When $\pmb{s} \in \{0, 1\}^n$, to rebalance it and to make it symmetric around zero, rescaling is done by multiplying the first $n$ rows of $\pmb{B}$ by $2\sigma$ and then $(\sigma,\cdots,\sigma, 0,\cdots,0)^T$ is subtracted from $\pmb{w}$. So that the difference of $\pmb{w}-\pmb{v}$ is of the form
+$(\pm \sigma, \cdots , \pm \sigma, e_1, \cdots , e_m)^T$ which is more balanced.
+
+In the embedded lattice formed by the new attack, determinant has been increased by a factor of $\delta^n$ (or $(2\delta)^n$ in the case of $\{0, 1\}$) with $\lambda_1(\mathcal{L}') \equiv \sqrt{m+n}\cdot \sigma$ and $\lambda_2(\mathcal{L}') \equiv (q^m\sigma^n)^{1/(m+n)}\sqrt{\frac{m+n}{2\pi e}}$ (from Gaussian heuristic) where $m$ is the number of LWE samples being used. Hence the new lattice gap is $\gamma = \lambda_2(\mathcal{L}')/\lambda_1(\mathcal{L}')$. Thus a lattice reduction algorithm with Hermite factor $\delta \leq \gamma^{1/(m+n)}$ is needed to solve the problem. Regarding the optimal number of samples ($m' \approx m+n$) for a successful attack, lemma \ref{lemma:optimal_samples} gives an estimate.
+\begin{lemma}
+    \label{lemma:optimal_samples}
+    For a given $q,n,\sigma$ and $m' \approx m+n$, where $m'$ is the dimension of the embedded lattice. The optimal value of $m'$ required to obtain a given Hermite factor $\delta$ can be given by
+    \begin{equation*}
+        \sqrt{\frac{n(\log{q}-\log{\sigma})}{\log{\delta}}}
+    \end{equation*}
+\end{lemma}
+The result follows from minimizing the function
+\begin{equation*}
+    f(m') = q^{(m'-n)/m'}\sigma^{n/m'}\delta^{-m'}
+\end{equation*}
+
+For experimentation, as the norm of the error vector is unknown to the attacker, it is considered as the average norm of $10^4$ randomly sampled vectors from error distribution, and for $\lambda_2$, the Gaussian heuristic is used. Theoretical analysis performed by Bai and Galbraith showed that decoding with the rescaling technique presented above is superior to the previous methods, viz., when CVP is solved using the embedding process, it is also experimentally verified by authors. Finally, the authors concluded from both theoretical and experimental results that binary LWE with dimension $n\log{(\log{(n)})}$ gives the same hardness as that of the standard LWE problem.
+
+
+
+
+
+%The dual strategy reduces the problem of distinguishing LWE from uniform to the SIS problem [Ajt96]:
+\subsection{Dual lattice attacks against small-secret LWE:}
+\label{sec:dimension_error_trade_off}
+Albrecht in \cite{albrecht2017dual} suggested a variant of dual attack applicable to small secret LWE problems focusing on its use in homomorphic encryption. The attack is motivated by the progress in BKW-style algorithms for
+%solving LWE problem-- a concept similar to that of the one used in the BKW style algorithm is used for
+lattice reduction viz.,
+%Same as that of the BKW algorithm where BKW first produces elimination tables and then makes use of those tables to sample possibly many LWE samples in dimension $n-k$ relatively cheaply. The approach is used for lattice reduction in the low advantage regime, viz., perform
+one expensive lattice reduction step followed by many relatively cheap lattice reductions on rerandomized bases.
+
+The advantage of the attack is that it essentially reduces the overall solving cost by a factor of $m$, where $m$ is the number of samples required to distinguish a discrete Gaussian distribution with a large standard deviation from uniform modulo $q$.
+%This approach can be translated into any LWE instance, i.e., it does not rely on an unusually short secret. Thus, it gives cause for a moderate revision of many LWE estimates based on the dual attack in the low advantage regime.
+However, it relies on the heuristic that these cheap lattice reduction steps produce sufficiently short and random vectors. It also scales the exponent of the dual-lattice attack by a factor of $\frac{2L}{(L+1}$, when the secret has constant hamming weight $h$ and $\log {q} = \theta(L\log {n})$ with $L$ representing the maximum depth of supported circuits. In addition, it halves the dimension of the lattice under consideration at a multiplicative cost of $2^h$ operations. The main idea of the attack goes as follows.
+
+
+
+
+
+
+
+
+%Albreath
+Given a LWE sample $(\pmb{A},\pmb{b})\in \mathbb{Z}^{m \times n}_q \times \mathbb{Z}_q^{m}$, construct a basis $\pmb{Y}$ for its left kernel modulo $q$. Say, $\Lambda_q(\pmb{Y})$ represents the $q$-ary lattice  spanned by the rows of $\pmb{Y}$. With high probability $\pmb{Y}$ is an $(m-n)\times m$ matrix with volume of $\Lambda_q(\pmb{Y})$ as $q^n$. Let $\mathcal{L}$ be a basis for $\Lambda_q(\pmb{Y})$ and $m'=m-n$. Writing $\pmb{Y}=[\pmb{I}_{m'} |\pmb{Y}_{m'\times n}']$ we get
+\begin{equation*}
+    \pmb{L}=
+    \begin{pmatrix}
+        \pmb{I}_{m'} & \pmb{Y}'   \\
+        \pmb{0}      & q\pmb{I}_n
+    \end{pmatrix}
+\end{equation*}
+The goal is to find a short vector $\pmb{y}$ in the integer row span of $\mathcal{L}$, which can be used to distinguish an LWE sample from that of the random sample using the dual attack technique.
+
+%Say the cost of distinguishing LWE sample from that of the random sample with probability $\epsilon$ is $c$, then the cost of solving LWE problem is estimated as at least $c/\epsilon$ \cite{} [LP11]. Using Chernoff bound we can amplify a decision experiment succeeding with advantage $\epsilon$ to a constant advantage but this require about $1/\epsilon^2$ samples. Hence, in \cite{} [APS15] cost of dual attack is evaluated as the cost of running BKZ-$\beta$ to achieve the target $\delta_0$ multiplied by the number of samples required to distinguish with the target advantage, viz., $\approx c/\epsilon^2$. However, this can be reduced in the case of the dual attack by performing rerandomisation on the already reduced basis -- a concept motivated from the BKW algorithms first step and can be implemented as employed in fplll's implementation\cite{} of extreme pruning for BKZ2.0.
+
+In case of small secrets, similar to that of the BKW kind of algorithm as mentioned by Albrecht in \cite{albrecht2014lazy}, we do not need to find a short vector satisfying $\pmb{yA} \equiv 0 $ mod $q$, rather if the secret is sufficiently small then any $\pmb{y}$ such that $\pmb{y} \cdot \pmb{A}$ is short suffices. Alternatively, we are looking for short vectors $(\pmb{w},\pmb{v})$ in the lattice
+
+\begin{equation*}
+    \Lambda = \{(\pmb{y}, \pmb{x}) \in \mathbb{Z}^m \times \mathbb{Z}^n: \pmb{y} \cdot \pmb{A} \equiv \pmb{x} \}\ mod\ q
+\end{equation*}
+
+Given a short vector in $(\pmb{w},\pmb{v}) \in \Lambda$, we have
+
+\begin{equation*}
+    \pmb{w} \cdot \pmb{c} = \pmb{w} \cdot (\pmb{A} \cdot \pmb{s} + \pmb{e}) = <\pmb{v}, \pmb{s}> + <\pmb{w}, \pmb{e}>
+\end{equation*}
+
+Here, $\pmb{v}$ can be interpreted as noise from ``modulus switching" or quantization in BKW-style algorithms and $\pmb{w}$ to the multiplicative factor by which the LWE noise increases due to repeated subtractions.
+
+%In case of small secret LWE instances we have $||\pmb{s}|| < ||\pmb{e}||$. Hence, we may permit $||\pmb{v}|| > ||\pmb{w}||$ such that
+%\begin{equation*} ||<\pmb{w}, \pmb{s}>|| \approx ||<\pmb{v}, \pmb{e}>|| \end{equation*}
+
+Here as the secret comes from the small distribution. Thus considering lattice with scaling factor $c$ same as section \ref{sec:Galbraith_decoding}. We construct lattice as
+\begin{equation*}
+    \Lambda_c = \{(\pmb{y}, \pmb{x}/c) \in \mathbb{Z}^{m} \times (1/c \cdot \mathbb{Z})^n: \pmb{y} \cdot \pmb{A} \equiv c\cdot \pmb{x} \ mod\ q \}
+\end{equation*}
+Here the lattice $\Lambda_c$ has dimension $m' = m + n$ and volume whp $(q/c)^n$. For the construction of basis for $\Lambda_c$, we assume $A_{m-n:m}$ has a full rank (this holds with high probability for large $q$). Then $\Lambda_c = \Lambda(\mathcal{L}')$ with
+\begin{equation*}
+    \mathcal{L}'=
+    \begin{pmatrix}
+        \frac{1}{c}\pmb{I}_n \hspace{1em} & \pmb{0}_{n\times(m-n)} \hspace{1em} & \pmb{A}^{-1}_{m-n:m} \\
+                                          & \pmb{I}_{m-n}                       & \pmb{B}'             \\
+                                          &                                     & q\pmb{I}_n
+    \end{pmatrix}
+\end{equation*}
+where $[\pmb{I}_{m-n}|\pmb{B}']$ is a basis for the left kernel of $\pmb{A}$ mod $q$.
+
+To find the optimal value of $c$ we consider $c\cdot|<\pmb{y}_2, \pmb{s}>| \approx E[|<\pmb{y}_1, \pmb{e}>|]$. Furthermore considering $E[|<\pmb{y}_1, \pmb{e}>|] \approx \frac{\alpha q}{\sqrt{2\pi}} ||\pmb{y}_1||$, we obtain
+
+\begin{equation*}
+    c \approx \frac{\alpha q}{\sqrt{2\pi}} \cdot \frac{||\pmb{y}_1||}{|<\pmb{y}_2,\pmb{s}>|}
+\end{equation*}
+As the value of $\pmb{y}$ is short and also as the size of $\pmb{y}_1$ and $<\pmb{y}_2, \pmb{s}>$ are not known beforehand, thus heuristically it is assumed the value of $||\pmb{y}_1|| \approx \sqrt{\frac{m}{m+n}} ||\pmb{y}||$ and $|<\pmb{y}_2,\pmb{s}>| \approx \sqrt{\frac{h}{m+n}} ||\pmb{y}||$
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\begin{comment}
+In case of small secret LWE instances we have $||\pmb{s}|| < ||\pmb{e}||$. Hence, we may permit $||\pmb{v}|| > ||\pmb{w}||$ such that
+\begin{equation*}
+    ||<\pmb{w}, \pmb{s}>|| \approx ||<\pmb{v}, \pmb{e}>||
+\end{equation*}
+
+Now to find the optimal value of $c$. Lattice reduction produces a vector $(\pmb{w}, \pmb{v})$ with
+\begin{equation*}
+    ||(\pmb{w}, \pmb{v})|| \equiv \delta^{m'} \cdot (q/c)^{n/m'}
+\end{equation*}
+which translates to a noise value
+\begin{equation*}
+    e = \pmb{w} \cdot \pmb{A} \cdot \pmb{s} + <\pmb{w}, \pmb{e}> = <c \cdot \pmb{v}, \pmb{s}> + <\pmb{w}, \pmb{e}>
+\end{equation*}
+to equalise the noise contributions of both parts of the above sum we set $c$ as
+\begin{equation*}
+    c = \frac{\alpha q}{\sqrt{2 \pi h}} \cdot\sqrt{m'-n}
+\end{equation*}
+end{comment}
+
+\begin{lemma}
+    Let $m'=2n$ and $c=\frac{\alpha q}{\sqrt{2\pi h}\cdot \sqrt{m'-n}}$. A lattice reduction algorithm achieving $\delta_0$ such that
+    \begin{equation*}
+        \log {\delta_0} =\frac{\log {(\frac{2n \log^2{\epsilon}})}}{8n}
+    \end{equation*}
+    leads to an algorithm solving decisional LWE with $s \leftarrow B^-_h$ instance with advantage $\epsilon$ and the same cost.
+\end{lemma}
+
+The general dual strategy, without exploiting small secrets, requires
+\begin{equation*}
+    \log \delta_0 =\frac{\log {(\frac{{-2\log {\epsilon}}}{\alpha^2 q}})}{4n}
+\end{equation*}
+
+according to [APS15]. For Homomorphic encryption library HElib’s choice of $8 = \alpha q$ and $h = 64$ and setting $\epsilon$ constant, this expression simplifies to
+\begin{equation*}
+    \log \delta_0 = \frac{\log {q} + C_d}{4n}
+\end{equation*}
+for some constant $C_d$. On the other hand, Lemma above simplifies to
+\begin{equation*}
+    \log \delta_0 = \frac{\log {q} + \frac{1}{2}\log {n} + C_m}{4n}
+\end{equation*}
+
+for some constant $C_m < C_d$.
+For a circuit of depth $L$, BGV requires $\log {q} = L\log {n} + O(L)$ [GHS12b, Appendix C.2]. Applying Lemma 2, we get that
+\begin{equation*}
+    lim_{k \rightarrow \infty} \frac{cost_m}{cost_d}= lim_{n \rightarrow \infty}\frac{cost_m}{cost_d}=\frac{2L}{2L+1}
+\end{equation*}
+
+where $cost_d$ is the log cost of the standard dual attack, $cost_m$ is the log cost under Lemma above and $\kappa$ the security parameter. The same analysis applies to any constant $h$.
+\end{comment}
+
+
+
+
+
+
+
+
+
+
+
+
+
+In the case of a sparse secret LWE problem, further optimization can be carried out as follows: write $\pmb{A} = [\pmb{A}_0 | \pmb{A}_1]$ with $\pmb{A}_0 \in \mathbb{Z}^{m\times(n-k)}_q$ and $\pmb{A}_1 \in \mathbb{Z}^{m\times k}_q$ and find a short vector in the lattice
+
+\begin{equation*}
+    \Lambda = \{\pmb{y} \in \mathbb{Z}^m : \pmb{y} \cdot \pmb{A}_0 \equiv 0 \ mod\ q\}.
+\end{equation*}
+Each short vector $\pmb{y} \in \Lambda$ produces a sample for an LWE instance in dimension $k$ and noise rate $\alpha'=E[||\pmb{y}||]\cdot \alpha$. The reduced LWE instances in dimension $k$ can be solved using any algorithm that solves the LWE problem. It is further simplified using a random permutation function $\pmb{P}$ by writing $\pmb{A} \cdot \pmb{P}=[\pmb{A}_0|\pmb{A}_1]$ and $\pmb{s} \cdot \pmb{P}=[\pmb{s}_0|\pmb{s}_1]$.
+
+A good $\pmb{P}$ places all non-zero components of $\pmb{s}$ in $\pmb{s}_0$ such that $\pmb{A}_1\cdot \pmb{s}_1 \equiv 0$ mod $q$. Computing probability for the same gives us the probability
+($1-h/n$) a coordinate $s_{(i)}$ is zero. Thus picking $k$ components of $\pmb{s}$ at random will pick only components such that $s_{(i)}=0$ with probability
+\begin{equation*}
+    p_k = \prod^{k-1}_{i=0} \Big(1- \frac{h}{n-i}\Big)=\frac{ \binom {n-h}k}{\binom nk} \approx \Big(1- \frac{h}{n}\Big)^k
+\end{equation*}
+Here the success probability can be amplified close to one by repeating the elimination and solving stages $\approx 1/p_k$ times, assuming we distinguish the LWE samples from that of the random samples with probability close to $1$.
+
+A further improvement can be applied by considering $\pmb{s}_1$=0 and performing an exhaustive search over solutions that occur with sufficiently high probability. For the choices of $\pmb{P}$, the probability that $\pmb{s}_1$ contains $(k-j)$ components with $s_{1,(i)}= 0$ and exactly $j$ components with $s_{1,(i)} \neq 0$ is
+\begin{equation*}
+    p_{k,j} = \frac{\binom{n-h}{k-j} \binom{h}{j}}{\binom{n}{k}}
+\end{equation*}
+which is nothing but a hypergeometric distribution.
+
+In short, when $\pmb{s} \leftarrow_{\$} \pmb{B}_h^-$ (ternary secret with $h$ non-zero components), to check if any of those candidates for $\pmb{s}_1$ is correct, we need to compare $\binom{k}{j} \cdot 2^j$ distributions against the uniform distribution.
+
+Now consider several samples $m$ in such a way that distinguishing the LWE sample from that of the uniform sample succeeds with a probability close to $1$. The technique mentioned above succeeds with probability $\sum^l_{j=0} p_{k,j}$, where $l$ represents the density parameter and $0 \leq l \leq 64$. The asymptotic behavior of the same is given by the lemma below.
+\begin{lemma}
+    Let $c_{n,\alpha,q}$ be the cost of solving LWE with parameters $n, \alpha, q$ with probability $\geq (1-2^{-p^2_{h,d}})$ for given $0 \leq h < n$ and $d>1$ constants. let $p_{h,d}$ be some constant depending on $h$ and $d$. Then, solving LWE in dimension $n$ with
+    $\pmb{s} \leftarrow \pmb{B}_h^{\pm}$ ( $\pmb{s} \leftarrow \{-1,0,1\}^n$ with $h$ non-zero components) costs $O(C_{n-n/d,\alpha,q})$ operations
+\end{lemma}
+
+Here $p_{h,d} = lim_{n \rightarrow \infty} \binom{n-h}{n/d}/\binom{n}{n/d}$ is a constant for any given constant $0 \leq h < n$ and $d > 1$. Thus solving $O(1/p_{h,d})=O(1)$ instances in dimension $n-n/d$ solves the instance in dimension $n$. When $d=2$ (binary), we get $lim_{n \rightarrow \infty} \binom{n-h}{n/2}/\binom{n}{n/2}=2^{-h}$ and an overall costs evaluates to $O(2^h\cdot C_{n/2,\alpha,q})$. This improves on exhaustive search, which costs $O(2^h\cdot \binom{n}{h})$ when $C_{n/2,\alpha,q} \in o(\binom{n}{h})$
+
+Finally, the attack is covered by a program that gives the estimated bit-security level of queried LWE parameters called LWE-estimator [APS15]. It shows the best performance for LWE parameters used for HE, large modulus, and the sparse ternary secret vector.
+
+
+
+
+\begin{comment}
+Given a target for the norm of y and hence for $\delta_0$, HElib2 estimates the cost of lattice reduction by relying on the following formula from \cite{}[LP11]:
+\begin{equation*}
+    \log {t}_{BKZ}(\delta_0) = \frac{1.8}{\log {\delta_0}}-110
+\end{equation*}
+
+
+where $t_{BKZ(\delta_0)}$ is the time in seconds it takes to BKZ reduce a basis to achieve root-Hermite factor $\delta_0$. This estimate is based on experiments with BKZ in the NTL library [Sho01] and extrapolation.
+
+The [LP11] model for estimating the cost of lattice-reduction is not correct firstly it expresses runtime in seconds instead of units of computation. Secondly, the LP model does not fit the implementation of BKZ in NTL.
+Thirdly, the LP model assumes a linear relation between $\frac{1}{\log(\delta_0)}$ and the log of the running time of BKZ, but from the “lattice rule-of-thumb” $(\delta_0 \approx \beta^{1/(2\beta)})$ and $2^{\theta(\beta)}$ being the complexity of the best known algorithm for solving the shortest vector problem, we get:
+\begin{lemma}
+    ([APS15]). The log of the time complexity achieve a root-Hermite factor $\delta_0$ with BKZ is
+    \begin{equation*}
+        \Theta \Big( \frac{\log{(1/ \log \delta_0)}}{\log{\delta_0}} \Big)
+    \end{equation*}
+    if calling the SVP oracle costs $2^{\theta(\beta)}$
+\end{lemma}
+
+
+
+\begin{comment}
+The
+BKZ algorithm internally calls an oracle for solving the shortest vector problem
+in smaller dimension. The most practically relevant algorithms for realising this
+oracle are enumeration without preprocessing (Fincke-Pohst) which costs 2Θ(β
+2
+)
+operations, enumeration with recursive preprocessing (Kannan) which costs β
+Θ(β)
+and sieving which costs 2Θ(β)
+. NTL implements enumeration without preprocessing. That is, while it was shown in [Wal15] that BKZ with recursive BKZ
+pre-processing achieves a run-time of poly(n) · β
+Θ(β)
+, NTL does not implement
+the necessary recursive preprocessing with BKZ in smaller dimensions. Hence, it
+runs in time poly(n) · 2
+Θ(β
+2
+)
+for block size β.
+
+Similar to BKW, which in a first step produces elimination tables which allow sampling smaller dimensional LWE samples in $O(n^2)$ operations, we first produce a relatively good basis $L'$ to allow sampling $y_i$ relatively efficiently
+
+
+Then rerandomisation strategy same as that of employed in fplll’s implementation [FPL16] of extreme prunining for BKZ 2.0.5 This rerandomisation strategy first permutes rows and then adds three existing rows together using ±1 coefficients, which would increase norms by a factor of $\sqrt{3} < 2$ when all vectors initially have roughly the same norm. Then LLL algorithm is executed,
+by setting $\beta'= 2$, and assume that our $y_i$ have their norms increased by a factor of two, i.e. $E[||y_i||] = 2\cdot \delta_0^m q^{n/m}$.
+
+
+
+In the case of BKW-style SIS Strategy for solving LWE we enforce that distinguishing LWE from uniform succeeds with probability $1-2^{-\kappa}$ when we guessed $s'$ correctly. Clearly, this parameter can be improved, i.e. this probability reduced, but amplifying the success probability is relatively cheap, so we forego this improvement.
+\end{comment}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\begin{comment}
+Given a matrix $A \in \mathbb{Z}^{m\times n}_q$, construct a basis $Y$ for its left kernel modulo $q$ and then consider the $q$-ary lattice $\Lambda_q(Y)$ spanned by the rows of $Y$. With high probability $Y$ is an $(m-n)\times m$ matrix and $\Lambda_q(Y)$ has volume $q^n$. Let $L$ be a basis for $\Lambda_q(Y)$, $m'=m-n$ and write $Y =[I_{m'}|Y']$ then we have
+\begin{equation*}
+    L =\begin{pmatrix}
+        I_m' & Y'   \\
+        0    & qI_n
+    \end{pmatrix}
+\end{equation*}
+In other words, we are attempting to find a short vector y in the integer row span of $L$.
+
+They also review the runtime provided by LP in \cite{ } and provided a new runtime for BKZ algorithm.
+
+Dual attack as mentioned in \ref{Text:Deal_attack} can be used to solve LWE problem and becomes very useful in the case of a small secret LWE problem. A natural improvement of the dual attack can be obtained by considering the scaled or normal form of dual lattice. A scaled normal dual lattice can be defined by
+\begin{equation*}
+    \Lambda_{q,c}(A) = \{(v_1, v_2) \in \mathcal{Z}^m \times (\frac{1}{c}\mathbb{Z})^n :v_1^tA \equiv_q c\cdot v_2 \}
+\end{equation*}
+
+In case of dual attack we find a short vector $(y_1, y_2) \in \Lambda_{q,c}(A)$ and then compute the inner product as
+\begin{equation*}
+    <y_1,b> = <y_1, As> + <y_1, e> \equiv_q c \cdot <y_2, s> + <y_1, e>
+\end{equation*}
+for the LWE sample $(A,b=As+e)$ that allows us to solve the DLWE problem.
+
+Here the constant $c$ in such a way that it satisfies the relation
+\begin{equation*}
+    |c \cdot <y_2, s> \approx E[|<y_1, e>|]
+\end{equation*}
+in order that each summand equally contributes to error $e$. First we estimate $E[|<y_1, e>|] \approx \frac{\alpha q}{\sqrt{2\pi}}$ and then $c$ would be taken to satisfy
+\begin{equation*}
+    c \approx \frac{\alpha q}{\sqrt{2 \pi}}\cdot \frac{||y_1||}{|<y_2,s>|}
+\end{equation*}
+Although we assume that $y$ is short, Since the exact size of $y_1$ and $<y_2,s>$, are not sure, we heuristically assume that
+
+$||y_1|| \approx \frac{m}{m+n}||y||$ and $||<y_2,s>|| \approx \frac{h}{m+n}||y||$
+
+\begin{assumption}
+    Assumption 1 Let $y \in L_c(A)$ be a short vector obtained from lattice reduction. Then each entry of $y$ has similar size $||y||/\sqrt{m+n}$
+\end{assumption}
+\begin{comment}
+If the secret vector s is sparse, then the columns of A that correspond to the
+zero components of s have no influence on b = As + e. Now one can apply the
+dual attack by choosing some random portion of columns of A, and this strategy
+also works if all the other columns correspond to zero component part of s. This
+strategy naturally drops the attack success probability by the guessing success
+probability, but since the dimension is reduced, it takes shorter time for finding
+a short vector, which enables one to choose the optimal point where the total
+attack complexity is minimized.
+Albrecht [Alb17] further observed here, although some columns are wrongly
+guessed, one can compensate it by a brute-force method: Let A0 be the matrix
+consisting of the ignored columns of A in the above strategy and s
+0 be the part
+of secret key corresponding to A0
+. Then, one has
+hv, bi = vA
+0
+s
+0 + hv, ei mod q,
+which can be understood as a new LWE sample (vA0
+, vA0s
+0+e
+0
+) with e
+0 = hv, ei.
+In this regard, the dual attack strategy can be considered as a dimension error
+trade-off. Now, by exhaustively searching possible s
+0
+to some extent, one can
+succeed to have hv, ei even if some guess are incorrect, which increases the
+attack success probability with proper amount of exhaustive search.
+end{comment}
+
+
+%BKZ with blocksize β costs cn · tβ clock cycles for dimension n lattice, and we put c = 16 according to [Alb17].
+
+%https://eprint.iacr.org/2019/1114.pdf
+
+
+
+\end{comment}
+
+
+\subsection{Hybrid of MitM and Dual attack on small secret LWE:}
+Cheon et al. in \cite{cheon2019hybrid} presented a hybrid attack, a combination of dual attack and meet-in-the-middle (MITM), which outperforms Albrecht’s attack on small secret LWE. They adopted the MITM attack technique designed for NTRU due to Odlyzko to the LWE problem and performed a rigorous analysis. The performance of their MITM attack depends on the relative size of the error and modulus; the larger the LWE modulus, the large the error it can tolerate. Their technique of using MITM attack can also be combined with that of Albrecht’s observation of dual attack as a dimension-error trade-off, giving rise to their hybrid attack that uses MITM instead of the exhaustive search as mentioned by Albrecht in \cite{albrecht2017dual}. The advantage of using a MITM attack is that it reduces the attack cost proportional to the square root of the number of candidate secret vectors. While at the same time, it is less sensitive to the absolute size of error when the ratio of error and modulus is sufficiently small, making MITM attack highly appropriate for the trade-offed LWE sample for the large modulus case with significant performance improvement on the sparse ternary secret LWE problems.
+%Cheon et al. in \cite{cheon2019hybrid} used the MitM technique along with Albrecht’s\cite {albrecht2015concrete} dual attack (dimension-error trade-off), to form a hybrid attack technique and used it to solve the sparse ternary secret LWE problem.
+Unlike Albrecht’s lexicographical sorting, they used locality sensitive hashing technique, adopted from Odlyzko’s MITM attack on NTRU \cite{NHowgraveGraham}, to search the close vector in the presence of noise. In brief, the attack goes as mentioned below.
+
+Given a LWE sample $(\textbf{A},\textbf{b}) \in \mathbb{Z}_q^{m \times (n+1)}$ with secret $\textbf{s}$ sampled from ternary distribution with hamming weight $h$, meet-in-the-middle strategy considers the below noisy relation
+\begin{equation}
+    \label{eq:MITM_v2}
+    \textbf{As}_1 \approx \textbf{b}-\textbf{As}_2
+\end{equation}
+for some secret $\textbf{s}_1,\textbf{s}_2 \in \{\pm1,0\}$ with hamming weight $\leq \frac{h}{2}$, satisfying $\textbf{s}=(\textbf{s}_1+\textbf{s}_2)$. A table $\Gamma$ is prepared as
+\begin{equation}
+    \label{eq:MITM_v1}
+    \Gamma = \{ \textbf{Av}_1 \in \mathbb{Z}_q^m: \textbf{v}_1 \in \{\pm1,0\}^{\frac{h}{2}} \}
+\end{equation}
+Now, closeness of $(\textbf{b}-\textbf{Av}_2)\in \mathbb{Z}^m_q$ to $\Gamma$ is checked by exhaustively investigating $\textbf{v}_2 \in \{\pm1,0\}^{\frac{h}{2}}$. Closeness is determined based on the size of error $\textbf{e}$. If such closeness is observed for some vector $\textbf{v}_2$, then $\textbf{v}_2$ is the right half of the secret key $\textbf{s}$. If no such $\textbf{v}_2$ is observed, then the sample is from a uniform distribution.
+
+A simple exhaustive search can be used to find the close vector; however, the drawback of this naive technique is that it costs too much time. Thus, to keep the searching cost low and find a solution in the presence of noise locality sensitive hashing technique has been used, adapted from Odlyzko’s MITM attack on NTRU.
+
+It works in two steps, which are better known as preprocessing and search steps. The preprocessing step constructs a hash table $\mathcal{H}$ of size $2^m$ using equation \ref{eq:MITM_v1}. In second step on input a hash table $\mathcal{H}$, a query $\pmb{a} \in \mathbb{Z}^m_q$ and distance bound $B$ it finds a vector $\pmb{t}$ satisfying $||\pmb{a}-\pmb{t}||_{\infty} \leq B$. It is to be noted that this MITM technique’s cost heavily depends on the dimension of the secret vector but is less sensitive to the error size. Thus, Albrecht’s dual attack (dimension-error trade-of), as mentioned in section \ref{sec:dimension_error_trade_off}, can further increase the attack’s efficiency by decreasing the lattice dimension.
+
+The complete attack proceeds by initially reducing the dimension of the lattice problem by using the Albrecht dimension error trade-off, followed by using the MITM attack to solve the reduced small dimensional LWE problem. The hybrid attack technique’s advantage is that it performs better than the earlier attack technique presented by Albrecht et al. \cite{albrecht2017dual} for modulus higher than $2^{40}$. However, for the smaller modulus case, the MITM algorithm runs in time that grows exponentially with $B/q$, where $B$ is the error size. This is because to have a small $B/q$ after the dimension-error trade-off, the attack requires finding shorter vectors in the lattice reduction stage than Albrecht’s dual attack. The additional cost of finding such a shorter vector offsets the benefit of the MITM approach; as a result, exhaustive search performs better for the small modulus $q$.
+
+
+The authors also provided
+%Finally, they implemented
+a sage module that estimates the attack complexity of their algorithm upon LWE-estimator with estimator showing a significant performance improvement viz., more than 1000 times faster compared to the previous attacks on average in the case of sparse ternary secret LWE problems for the LWE parameter that are used in FHE. Finally, the authors suggested revisiting and changing the parameter selection that is used in fully homomorphic encryption implementations in case of sparse ternary LWE problems with large modulus $q$.
+%Based on the new attack technique, they also revised the earlier security estimates for parameter sets suggested for HElib and SEAL.
+
+
+
+
+
+
+\begin{comment}
+we recast this attack as the lattice-reduction analogue of the BKW algorithm and adapt techniques and lessons learned from BKW-style algorithms.
+
+BKW as a recursive dimension
+reduction algorithm for LWE instances. Each step transforms an LWE instance
+in dimension n to an instance in dimension n − k at the cost of an increase
+in the noise by a factor of √
+2. This smaller instance is then reduced further
+by applying BKW again or solved using another algorithm for solving LWE;
+typically some form of exhaustive search once the dimension is small enough.
+To achieve this dimension reduction, BKW first produces elimination tables
+and then makes use of these tables to sample possibly many LWE samples in
+dimension n−k relatively cheaply. We translate this approach to lattice reduction
+in the low advantage regime: we perform one expensive lattice reduction step
+followed by many relatively cheap lattice reductions on rerandomised bases. This
+essentially reduces the overall solving cost by a factor of m, where m is the
+number of samples required to distinguish a discrete Gaussian distribution with
+large standard deviation from uniform modulo q. We note that this approach
+applies to any LWE instance, i.e. does not rely on an unusually short secret and
+thus gives cause for a moderate revision of many LWE estimates based on the
+dual-attack in the low advantage regime. It does, however, rely on the heuristic that these cheap lattice reduction steps produce sufficiently short and random
+vectors. We give evidence that this heuristic holds.
+
+we observe that the normal form of the dual attack — finding
+short vectors y such that y · A ≡ x mod q is short — is a natural analogue of
+“lazy modulus switching” [AFFP14]. Then, to exploit the unusually small secret,
+we apply lattice scaling as in [BG14]. The scaling factor is somewhat analogous to
+picking the target modulus in modulus switching resp. picking the (dimension of
+the) code for quantisation. This technique applies to any B-secret LWE instance.
+For B
+−
+h
+-secret instances, it reduces the cost of the dual attack by a factor of
+2L/(2L + 1) in the exponent when log q = Θ (Llog n) for L the supported depth
+of FHE circuits and when h is a constant.
+
+we focus on s ←$ B\pm h$ and adapt the dual attack to find
+short vectors which produce zero when multiplied with a subset of the columns
+of A. This, as in BKW, produces a smaller, easier LWE instance which is then
+solved using another algorithm. In BKW, these smaller instances typically have
+very small dimension (say, 10). Here, we consider instances with dimension of
+several hundreds. This is enabled by exploiting the sparsity of the secret and
+by relaxing the conditions on the second step: we recover a solution only with
+a small probability of success. The basic form of this attack does not rely on
+the size of the non-zero components (only on the sparsity) and reduces the
+cost of solving an instance in dimension n to the cost of solving an instance in
+dimension n/2 multiplied by 2h where h is the hamming weight of the secret
+(other trade-offs between multiplicative cost increase and dimension reduction
+are possible and typically optimal). We also give an improved variant when the
+non-zero components are also small.
+Λq(B) for the q-ary lattice generated by the rows of the matrix B over
+Zq
+\end{comment}
+
+
+
+
+
+
+\begin{comment}
+\subsubsection{Meet-in-the-Middle for LWE}
+This attack technique to solve the LWE problem has been initially mentioned by Bai and Galbraith \cite{bai2014lattice} but with no explicit algorithm. The advantage of using a MITM attack over a naive brute force attack is that it is faster than naive brute force; however, the advantage comes with increased memory requirements. Thus there is a time-memory trade for the MitM attack.
+
+A detailed study of this attack technique is further carried out by Albrecht, Player, and Scott \cite{albrecht2015concrete} based on the lexicographical sorting to find the close vector in the presence of noise. However, Cheon et al. in \cite{cheon2019hybrid} claimed that Albrecht's algorithm analysis needs to be revised and shown in the appendix of the same paper that the probability of using lexicographical sorting for finding the close vector results in negligible success percent.
+
+Cheon et al. in \cite{cheon2019hybrid} used the MitM technique along with Albrecht’s\cite{albrecht2015concrete} dual attack (dimension-error tradeoff), to form a hybrid attack technique and used it to solve the sparse ternary secret LWE problem. Unlike Albrecht’s lexicographical sorting, they used locality sensitive hashing technique, adopted from Odlyzko's MITM attack on NTRU \cite{NHowgraveGraham}, to search the close vector in the presence of noise.
+
+To solve LWE problem with samples $(\textbf{A},\textbf{b}) \in \mathbb{Z}_q^{m \times (n+1)}$,secret vector $\textbf{s}$ sampled from ternary distribution with hamming weight $h$, using meet-in-the-middle strategy following noisy relation is considered
+\begin{equation*}
+    \textbf{As}_1 \approx \textbf{b}-\textbf{As}_2
+\end{equation*}
+for some secret $\textbf{s}_1,\textbf{s}_2 \in \{\pm1,0\}$ with hamming weight $\leq \frac{h}{2}$, satisfying $\textbf{s}=(\textbf{s}_1+\textbf{s}_2)$. A table $\Gamma$ is prepared as
+\begin{equation*}
+    \Gamma = \{ \textbf{Av}_1 \in \mathbb{Z}_q^m: \textbf{v}_1 \in \{\pm1,0\}^{\frac{h}{2}} \}
+\end{equation*}
+Now, closeness of $(\textbf{b}-\textbf{Av}_2)\in \mathbb{Z}^m_q$ to $\Gamma$ is checked by exhaustively investigating $\textbf{v}_2 \in \{\pm1,0\}^{\frac{h}{2}}$. Closeness is determined based on the size of error $\textbf{e}$. If such closeness is observed for some vector $\textbf{v}_2$, then $\textbf{v}_2$ is the right half of the secret key $\textbf{s}$. If no such $\textbf{v}_2$ is observed, then the sample is from a uniform distribution.
+
+https://eprint.iacr.org/2019/1114.pdf
+
+“dimensions for free” [Duc18,ADH+19]
+https://eprint.iacr.org/2015/046.pdf
+\end{comment}
+
+
+
+
+\subsection{Direct attack on small secret LWE} Recently, Chen et al. in \cite{chen2020concrete} studied concrete security of the LWE problem with small secrets, viz., Binary, Ternary, and Gaussian secrets using BKZ2.0. They used the uSVP approach to recover the shortest vector present in the lattice using BKZ2.0 and tried to validate different heuristics used to estimate the security of small secret LWE problems, viz. 2008 estimate and 2016 estimate.
+
+
+
+They follow the same approach presented in section \ref{Primal_uSVP}. When the secret is sampled from narrow distribution first minimum, have the expected norm of
+\begin{equation}
+    \lambda_1=\sqrt{\nu^2 \cdot ||s||^2+||e||^2+1} \approx \sqrt{\nu^2 \cdot h+m \cdot \sigma^2+1}
+    \label{eq:shortest_vec1}
+\end{equation}
+where $\sigma$ represents the standard deviation of the Gaussian distribution and $h$ is the expected value of $||s||^2$. For binary distribution $h=\frac{n}{2}$, similarly for ternary distribution $h=\frac{2}{3}n$
+
+The second minimum of the lattice is estimated using the Gaussian heuristic as
+\begin{equation}
+    \lambda_2 \approx min
+    \Big\{ q,\sqrt{\frac{d}{2\pi e}} \nu^{n/d} q^{m/d} \Big\}
+\end{equation}
+
+
+
+
+The problem at hand can be solved using uSVP using lattice reduction provided $\lambda_2$ is sufficiently larger than $\lambda_1$; $\nu$ is chosen sufficiently large to maximize the ratio $\frac{\lambda_2}{\lambda_1}$, where $\frac{\lambda_2}{\lambda_1}$ is
+\begin{equation}
+    \gamma=\frac{\lambda_2}{\lambda_1} \approx \frac{\Big\{ q,\sqrt{\frac{d}{2\pi e}} \nu^{n/d} q^{m/d} \Big\}}{\sqrt{\nu^2 h +m \sigma^2}}
+\end{equation}
+
+Later, theoretical values of $\delta$ using both 2008 and 2016 estimated as
+\begin{equation}
+    \delta^d_{2008}=\sqrt{\frac{d}{2 \pi e}} \delta^{-d} \\
+\end{equation}
+\begin{equation}
+    \delta^{2\beta-d}_{2016}=\sqrt{\frac{\beta}{d}} \delta^{d} \\
+\end{equation}
+Finally, the value $\delta_{2008}$ and $\delta_{2016}$ is compared with that of the experiential $\delta$ value calculated using equation \ref{eq:first_min} for randomly generated LWE instances.
+
+
+
+
+
+
+Performing rigorous experiments, the authors claimed that they successfully recovered the uSVP solution for a block size smaller than the expected block size given by the current LWE estimator. The takeaway of their work is that the security level of specific values of modulus $q$ and dimension $n$ are smaller than predicted by the online LWE Estimator \cite{albrecht2015concrete}. They were also able to solve many instances of the TU Darmstadt LWE challenge \cite{LweChallenge} significantly faster when the secret is chosen from the binary or ternary distributions.
+
+% Choosing parameters to optimize the second term in the minimum; Gaussian Heuristic will be asymptotically be smaller than $q$. Thus differentiating the expression above with respect to $\nu$ and setting the result to zero results into
+
+% \begin{equation}
+%     \nu^2=\frac{nm}{h(d-n)\sigma^2} \approx \frac{n}{h} \sigma^2
+% \end{equation}
+% This produces $\nu=\sqrt{2}\sigma$ for binary distribution and $\nu=\sqrt{\frac{3}{2}\sigma}$ for the ternary distribution. Substituting the above result into equation \ref{eq:shortest_vec1} results into
+% \begin{equation}
+%     \lambda_1 \approx \sqrt{d}\sigma
+% \end{equation}
+
+% Using above result into the 2008 estimate evaluates into
+% \begin{equation}
+%    \gamma \approx \frac{\sqrt{\frac{d}{2 \pi e}}\nu^{n/d}q^{m/d}} {\sqrt{d}\sigma} = \frac{1}{\sqrt{2 \pi e}}\frac{\nu^{n/d}q^{m/d}}{\sigma} \approx \frac{1}{\sqrt{2 \pi e}} (\frac{q}{\nu})^{-n/d} (\frac{q}{\sigma}) \geq \delta^d
+
+
